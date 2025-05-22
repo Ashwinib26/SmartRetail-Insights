@@ -42,3 +42,7 @@ Thumbs.db
 # Power BI / Tableau temporary files
 *.pbix
 *.twbx
+
+
+#data
+data/kaggle.json
