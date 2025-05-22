@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+*.pyo
+*.pyd
+
+# Virtual Environment inside backend/
+backend/venv/
+
+# Environment files
+.env
+*.env
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VSCode config
+.vscode/
+
+# Node.js (if frontend uses React)
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+build/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Pytest cache
+.pytest_cache/
+
+# Logs
+*.log
+
+# Compiled Cython files
+*.so
+
+# Power BI / Tableau temporary files
+*.pbix
+*.twbx
