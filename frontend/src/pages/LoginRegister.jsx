@@ -3,6 +3,7 @@ import axios from 'axios';
 
 function LoginRegister({ onSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -11,7 +12,7 @@ function LoginRegister({ onSuccess }) {
     const endpoint = isLogin ? 'login' : 'register';
     try {
       await axios.post(`http://localhost:5000/api/${endpoint}`, {
-        email, password
+        name, email, password
       }, { withCredentials: true });
       onSuccess();  // Inform Dashboard that login/register succeeded
     } catch (err) {
@@ -23,13 +24,22 @@ function LoginRegister({ onSuccess }) {
     <div style={{
       position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
       backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex',
-      justifyContent: 'center', alignItems: 'center'
+      justifyContent: 'center', alignItems: 'center', zIndex: 1000
     }}>
       <div style={{
         backgroundColor: 'white', padding: '2rem', borderRadius: '8px',
         width: '300px', textAlign: 'center'
       }}>
         <h2>{isLogin ? 'Login' : 'Register'}</h2>
+        {!isLogin && (
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            style={{ width: '100%', marginBottom: '10px' }}
+          />
+        )}
         <input
           type="email"
           placeholder="Email"
@@ -50,7 +60,10 @@ function LoginRegister({ onSuccess }) {
         <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>
         <p style={{ marginTop: '10px' }}>
           {isLogin ? "Don't have an account?" : "Already have an account?"}
-          <button onClick={() => setIsLogin(!isLogin)} style={{ marginLeft: '5px' }}>
+          <button onClick={() => {
+            setIsLogin(!isLogin);
+            setError('');
+          }} style={{ marginLeft: '5px' }}>
             {isLogin ? 'Register' : 'Login'}
           </button>
         </p>
