@@ -66,5 +66,14 @@ def inventory():
         {'item': 'Laptop', 'stock': 20, 'alert': False}
     ])
 
+# @app.route('/api/forecast')
+# def forecast():
+#     model = joblib.load("models/sales_forecast_model.pkl")
+#     X_future = pd.DataFrame([...])  # Based on future date, store, promo info
+#     y_pred = model.predict(X_future)
+
+#     return jsonify({'predicted_sales': y_pred.tolist()})
+
+
 if __name__ == '__main__':
     app.run(debug=True)
