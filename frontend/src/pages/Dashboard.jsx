@@ -68,6 +68,17 @@ function Dashboard() {
               </ul>
             ) : <p>Loading inventory...</p>}
           </section>
+          <section>
+            <h2>Sales Forecast (via ML Model)</h2>
+            {forecast ? (
+              <div>
+                <p><strong>Category:</strong> {forecast.category}</p>
+                <p><strong>Region:</strong> {forecast.region}</p>
+                <p><strong>Next 7 Days Forecast:</strong> {forecast.next_7_days_sales.join(', ')}</p>
+              </div>
+            ) : <p>Loading forecast...</p>}
+          </section>
+
         </>
       )}
     </div>

@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
+import joblib
+import pandas as pd
+import numpy as np
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -10,6 +13,9 @@ CORS(app, supports_credentials=True)
 
 # Dummy in-memory database
 users_db = {}
+
+# Load your saved model
+model = joblib.load('D:/projects/Final Project/SmartRetail Insights/backend/models/sales_forecast_model.pkl')
 
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -51,10 +57,26 @@ def check_auth():
 def forecast():
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
+
+    # Dummy input row(s) to simulate forecasting
+    input_data = pd.DataFrame([{
+        'Store': 1, 'DayOfWeek': 1, 'Date': '2025-06-01', 'Sales': 0, 'Customers': 0,
+        'Open': 1, 'Promo': 1, 'StateHoliday': 0, 'SchoolHoliday': 0,
+        'CompetitionDistance': 200.0, 'CompetitionOpenSinceMonth': 9,
+        'CompetitionOpenSinceYear': 2010, 'Promo2': 1, 'Promo2SinceWeek': 13,
+        'Promo2SinceYear': 2015, 'Year': 2025, 'Month': 6, 'Day': 1, 'WeekOfYear': 22,
+        'IsWeekend': 0, 'StoreType_a': 1, 'StoreType_b': 0, 'StoreType_c': 0,
+        'StoreType_d': 0, 'Assortment_a': 0, 'Assortment_b': 1, 'Assortment_c': 0,
+        'PromoInterval_Feb,May,Aug,Nov': 0, 'PromoInterval_Jan,Apr,Jul,Oct': 1,
+        'PromoInterval_Mar,Jun,Sept,Dec': 0, 'PromoInterval_None': 0
+    }])
+
+    prediction = model.predict(input_data)[0]
+
     return jsonify({
         'category': 'Electronics',
         'region': 'North',
-        'next_7_days_sales': [200, 180, 210, 190, 205, 230, 220]
+        'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]  # mock trend
     })
 
 @app.route('/api/inventory', methods=['GET'])
@@ -66,14 +88,6 @@ def inventory():
         {'item': 'Laptop', 'stock': 20, 'alert': False}
     ])
 
-# @app.route('/api/forecast')
-# def forecast():
-#     model = joblib.load("models/sales_forecast_model.pkl")
-#     X_future = pd.DataFrame([...])  # Based on future date, store, promo info
-#     y_pred = model.predict(X_future)
-
-#     return jsonify({'predicted_sales': y_pred.tolist()})
-
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
+
