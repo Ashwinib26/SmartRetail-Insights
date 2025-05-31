@@ -8,13 +8,10 @@ import numpy as np
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 
-# Enable CORS with credentials support
 CORS(app, supports_credentials=True)
 
-# Dummy in-memory database
 users_db = {}
 
-# Load your saved model
 model = joblib.load('D:/projects/Final Project/SmartRetail Insights/backend/models/sales_forecast_model.pkl')
 
 @app.route('/api/register', methods=['POST'])
@@ -22,13 +19,10 @@ def register():
     data = request.json
     email = data.get('email')
     password = data.get('password')
-
     if not email or not password:
         return jsonify({'error': 'Email and password required'}), 400
-
     if email in users_db:
         return jsonify({'error': 'User already exists'}), 400
-
     hashed = generate_password_hash(password)
     users_db[email] = hashed
     session['user'] = email
@@ -39,11 +33,9 @@ def login():
     data = request.json
     email = data.get('email')
     password = data.get('password')
-
     user = users_db.get(email)
     if not user or not check_password_hash(user, password):
         return jsonify({'error': 'Invalid credentials'}), 401
-
     session['user'] = email
     return jsonify({'message': 'Logged in successfully'}), 200
 
@@ -53,12 +45,12 @@ def check_auth():
         return jsonify({'authenticated': True})
     return jsonify({'authenticated': False}), 401
 
+# Existing static forecast GET endpoint (unchanged)
 @app.route('/api/forecast', methods=['GET'])
 def forecast():
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
 
-    # Dummy input row(s) to simulate forecasting
     input_data = pd.DataFrame([{
         'Store': 1, 'DayOfWeek': 1, 'Date': '2025-06-01', 'Sales': 0, 'Customers': 0,
         'Open': 1, 'Promo': 1, 'StateHoliday': 0, 'SchoolHoliday': 0,
@@ -70,14 +62,42 @@ def forecast():
         'PromoInterval_Feb,May,Aug,Nov': 0, 'PromoInterval_Jan,Apr,Jul,Oct': 1,
         'PromoInterval_Mar,Jun,Sept,Dec': 0, 'PromoInterval_None': 0
     }])
-
     prediction = model.predict(input_data)[0]
-
     return jsonify({
         'category': 'Electronics',
         'region': 'North',
-        'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]  # mock trend
+        'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]
     })
+
+# New POST forecast endpoint to accept dynamic input JSON
+@app.route('/api/forecast', methods=['POST'])
+def forecast_dynamic():
+    if 'user' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    data = request.json
+    if not data:
+        return jsonify({'error': 'No input data provided'}), 400
+
+    # Convert JSON input to DataFrame with 1 row (assuming correct keys are sent)
+    try:
+        input_df = pd.DataFrame([data])
+    except Exception as e:
+        return jsonify({'error': f'Invalid input format: {str(e)}'}), 400
+
+    try:
+        prediction = model.predict(input_df)[0]
+    except Exception as e:
+        return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
+
+    # Return the predicted sales for next 7 days (mock trend)
+    result = {
+        'category': 'Electronics',
+        'region': 'North',
+        'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]
+    }
+
+    return jsonify(result)
 
 @app.route('/api/inventory', methods=['GET'])
 def inventory():
@@ -90,4 +110,3 @@ def inventory():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
