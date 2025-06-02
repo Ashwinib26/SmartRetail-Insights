@@ -3,7 +3,6 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import joblib
 import pandas as pd
-import numpy as np
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -45,7 +44,6 @@ def check_auth():
         return jsonify({'authenticated': True})
     return jsonify({'authenticated': False}), 401
 
-# Existing static forecast GET endpoint (unchanged)
 @app.route('/api/forecast', methods=['GET'])
 def forecast():
     if 'user' not in session:
@@ -69,7 +67,6 @@ def forecast():
         'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]
     })
 
-# New POST forecast endpoint to accept dynamic input JSON
 @app.route('/api/forecast', methods=['POST'])
 def forecast_dynamic():
     if 'user' not in session:
@@ -79,25 +76,17 @@ def forecast_dynamic():
     if not data:
         return jsonify({'error': 'No input data provided'}), 400
 
-    # Convert JSON input to DataFrame with 1 row (assuming correct keys are sent)
     try:
         input_df = pd.DataFrame([data])
-    except Exception as e:
-        return jsonify({'error': f'Invalid input format: {str(e)}'}), 400
-
-    try:
         prediction = model.predict(input_df)[0]
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
-    # Return the predicted sales for next 7 days (mock trend)
-    result = {
+    return jsonify({
         'category': 'Electronics',
         'region': 'North',
         'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]
-    }
-
-    return jsonify(result)
+    })
 
 @app.route('/api/inventory', methods=['GET'])
 def inventory():
