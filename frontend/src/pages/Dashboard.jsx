@@ -95,7 +95,32 @@ function Dashboard() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:5000/api/forecast', inputData, { withCredentials: true })
+
+    const {
+      ForecastDate, // exclude helper field
+      ...rest
+    } = inputData;
+
+    // Define the 27 expected feature names by your model
+    const allowedFields = [
+      "Store", "DayOfWeek", "Promo", "SchoolHoliday",
+      "StateHoliday_0", "StateHoliday_a", "StateHoliday_b", "StateHoliday_c",
+      "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d",
+      "Assortment_a", "Assortment_b", "Assortment_c",
+      "Promo2", "Promo2SinceWeek", "Promo2SinceYear",
+      "CompetitionDistance", "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear",
+      "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct",
+      "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None",
+      "Open", "WeekOfYear"
+    ];
+
+
+    // Filter out only the required fields
+    const modelInput = Object.fromEntries(
+      Object.entries(rest).filter(([key]) => allowedFields.includes(key))
+    );
+
+    axios.post('http://localhost:5000/api/forecast', modelInput, { withCredentials: true })
       .then(res => {
         setDynamicForecast(res.data);
       })
@@ -103,6 +128,7 @@ function Dashboard() {
         alert('Prediction failed: ' + (err.response?.data?.error || err.message));
       });
   };
+
 
   return (
     <div style={{ padding: "2rem" }}>
