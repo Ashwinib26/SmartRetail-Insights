@@ -1,13 +1,104 @@
 body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f7f9fb;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  color: #333;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  color: #34495e;
+  margin-bottom: 0.5rem;
+}
+
+div {
+  max-width: 1000px;
+  margin: auto;
+  padding: 2rem;
+}
+
+section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease-in-out;
+}
+
+section:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+label {
+  display: inline-block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #2d3436;
+}
+
+input[type="number"],
+input[type="date"] {
+  width: 180px;
+  padding: 8px;
+  margin-top: 4px;
+  margin-left: 5px;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: border-color 0.3s;
+}
+
+input[type="number"]:focus,
+input[type="date"]:focus {
+  outline: none;
+  border-color: #0984e3;
+  background-color: #f0f8ff;
+}
+
+button[type="submit"] {
+  background-color: #0984e3;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #0652dd;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 1rem;
+}
+
+li {
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+strong {
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  label {
+    display: block;
+    width: 100% !important;
+    margin-bottom: 1rem;
+  }
+
+  input {
+    width: 100% !important;
+  }
 }

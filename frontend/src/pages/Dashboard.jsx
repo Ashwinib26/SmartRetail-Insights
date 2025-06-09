@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
+import 'D:/projects/Final Project/SmartRetail Insights/frontend/src/index.css'
 
 function Dashboard() {
   const [forecast, setForecast] = useState(null);
@@ -41,7 +42,7 @@ function Dashboard() {
     Day: 1,
     WeekOfYear: 1,
     IsWeekend: 0,
-    ForecastDate: '2022-01-01' // helper for date picker
+    ForecastDate: '2022-01-01' 
   });
 
 
