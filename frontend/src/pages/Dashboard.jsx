@@ -33,8 +33,17 @@ function Dashboard() {
     PromoInterval_Feb_May_Aug_Nov: 0,
     PromoInterval_Jan_Apr_Jul_Oct: 1,
     PromoInterval_Mar_Jun_Sept_Dec: 0,
-    PromoInterval_None: 0
+    PromoInterval_None: 0,
+
+    Open: 1,
+    Year: 2022,
+    Month: 1,
+    Day: 1,
+    WeekOfYear: 1,
+    IsWeekend: 0,
+    ForecastDate: '2022-01-01' // helper for date picker
   });
+
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
@@ -60,10 +69,28 @@ function Dashboard() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setInputData(prev => ({
-      ...prev,
-      [name]: isNaN(value) ? value : Number(value)
-    }));
+    if (name === "ForecastDate") {
+      const date = new Date(value);
+      setInputData(prev => ({
+        ...prev,
+        ForecastDate: value,
+        Year: date.getFullYear(),
+        Month: date.getMonth() + 1,
+        Day: date.getDate(),
+        WeekOfYear: getWeekOfYear(date),
+        IsWeekend: date.getDay() === 0 || date.getDay() === 6 ? 1 : 0
+      }));
+    } else {
+      setInputData(prev => ({
+        ...prev,
+        [name]: isNaN(value) ? value : Number(value)
+      }));
+    }
+  };
+
+  const getWeekOfYear = (date) => {
+    const oneJan = new Date(date.getFullYear(), 0, 1);
+    return Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
   };
 
   const handleSubmit = (e) => {
@@ -119,18 +146,22 @@ function Dashboard() {
           <section style={{ marginTop: "2rem" }}>
             <h2>Sales Forecast (Dynamic Input)</h2>
             <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
-              {Object.keys(inputData).map((key, idx) => (
-                <label key={idx} style={{ marginRight: '1rem', display: 'inline-block', width: '250px' }}>
-                  {key}:
-                  <input
-                    type="number"
-                    name={key}
-                    value={inputData[key]}
-                    onChange={handleChange}
-                    style={{ marginLeft: '5px' }}
-                  />
-                </label>
-              ))}
+              {Object.keys(inputData).map((key, idx) => {
+                const isDateField = key === 'ForecastDate';
+                return (
+                  <label key={idx} style={{ marginRight: '1rem', display: 'inline-block', width: '250px', marginBottom: '1rem' }}>
+                    {key}:
+                    <input
+                      type={isDateField ? 'date' : 'number'}
+                      name={key}
+                      value={inputData[key]}
+                      onChange={handleChange}
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </label>
+                );
+              })}
+
               <br /><button type="submit" style={{ marginTop: '1rem' }}>Get Forecast</button>
             </form>
 
