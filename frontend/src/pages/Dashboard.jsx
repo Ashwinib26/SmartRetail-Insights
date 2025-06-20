@@ -146,16 +146,6 @@ function Dashboard() {
 
       {isAuthenticated && (
         <>
-          <section>
-            <h2>Sales Forecast (Static)</h2>
-            {forecast ? (
-              <div>
-                <p><strong>Category:</strong> {forecast.category}</p>
-                <p><strong>Region:</strong> {forecast.region}</p>
-                <p><strong>Next 7 Days:</strong> {forecast.next_7_days_sales.join(', ')}</p>
-              </div>
-            ) : <p>Loading forecast...</p>}
-          </section>
 
           <section style={{ marginTop: "2rem" }}>
             <h2>Inventory Status</h2>
