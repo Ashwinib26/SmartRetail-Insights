@@ -94,9 +94,14 @@ button[type="submit"] {
   transition: background-color 0.3s;
 }
 
-button[type="submit"]:hover {
+button {
+  transition: background-color 0.3s;
+}
+
+button:hover {
   background-color: #0652dd;
 }
+
 
 ul {
   list-style-type: none;

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
-import 'D:/projects/Final Project/SmartRetail Insights/frontend/src/index.css'
+import 'D:/projects/Final Project/SmartRetail Insights/frontend/src/index.css';
 
 function Dashboard() {
   const [forecast, setForecast] = useState(null);
@@ -35,7 +36,6 @@ function Dashboard() {
     PromoInterval_Jan_Apr_Jul_Oct: 1,
     PromoInterval_Mar_Jun_Sept_Dec: 0,
     PromoInterval_None: 0,
-
     Open: 1,
     Year: 2022,
     Month: 1,
@@ -45,6 +45,17 @@ function Dashboard() {
     ForecastDate: '2022-01-01' 
   });
 
+  // ✅ Common button style
+  const buttonStyle = {
+    backgroundColor: '#0984e3',
+    color: 'white',
+    padding: '10px 20px',
+    fontSize: '1rem',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s'
+  };
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
@@ -111,21 +122,17 @@ function Dashboard() {
     }));
   };
 
-
   const getWeekOfYear = (date) => {
     const oneJan = new Date(date.getFullYear(), 0, 1);
     return Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
   };
 
+  const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const { ForecastDate, ...rest } = inputData;
 
-    const {
-      ForecastDate, // exclude helper field
-      ...rest
-    } = inputData;
-
-    // Define the 27 expected feature names by your model
     const allowedFields = [
       "Store", "DayOfWeek", "Promo", "SchoolHoliday",
       "StateHoliday_0", "StateHoliday_a", "StateHoliday_b", "StateHoliday_c",
@@ -138,8 +145,6 @@ function Dashboard() {
       "Open", "WeekOfYear"
     ];
 
-
-    // Filter out only the required fields
     const modelInput = Object.fromEntries(
       Object.entries(rest).filter(([key]) => allowedFields.includes(key))
     );
@@ -152,7 +157,6 @@ function Dashboard() {
         alert('Prediction failed: ' + (err.response?.data?.error || err.message));
       });
   };
-
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -169,45 +173,59 @@ function Dashboard() {
 
       {isAuthenticated && (
         <>
-
           <section style={{ marginTop: "2rem" }}>
             <h2>Inventory Status</h2>
             {inventory.length > 0 ? (
-              <ul>
-                {inventory.map((item, index) => (
-                  <li key={index}>
-                    {item.item} — Stock: {item.stock} — {item.alert ? '⚠️ Restock Needed' : '✅ OK'}
-                  </li>
-                ))}
-              </ul>
+              <>
+                <ul>
+                  {inventory.map((item, index) => (
+                    <li key={index}>
+                      {item.item} — Stock: {item.stock} — {item.alert ? '⚠️ Restock Needed' : '✅ OK'}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => navigate('/detailed-inventory')}
+                  style={{
+                    marginTop: '1rem',
+                    backgroundColor: '#0984e3',
+                    color: 'white',
+                    padding: '10px 20px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  View Detailed Inventory →
+                </button>
+              </>
             ) : <p>Loading inventory...</p>}
           </section>
 
           <section style={{ marginTop: "2rem" }}>
             <h2>Sales Forecast</h2>
-              <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
-                {Object.keys(inputData).map((key, idx) => {
-                  const isDateField = key === 'ForecastDate';
-                  return (
-                    <label key={idx} style={{ marginRight: '1rem', display: 'inline-block', width: '250px', marginBottom: '1rem' }}>
-                      {key}:
-                      <input
-                        type={isDateField ? 'date' : 'number'}
-                        name={key}
-                        value={inputData[key]}
-                        onChange={handleChange}
-                        style={{ marginLeft: '5px' }}
-                      />
-                    </label>
-                  );
-                })}
+            <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
+              {Object.keys(inputData).map((key, idx) => {
+                const isDateField = key === 'ForecastDate';
+                return (
+                  <label key={idx} style={{ marginRight: '1rem', display: 'inline-block', width: '250px', marginBottom: '1rem' }}>
+                    {key}:
+                    <input
+                      type={isDateField ? 'date' : 'number'}
+                      name={key}
+                      value={inputData[key]}
+                      onChange={handleChange}
+                      style={{ marginLeft: '5px' }}
+                    />
+                  </label>
+                );
+              })}
 
-                <div style={{ marginTop: '1rem' }}>
-                  <button type="submit" style={{ marginRight: '1rem' }}>Get Forecast</button>
-                  <button type="button" onClick={handleReset} style={{ backgroundColor: '#b2bec3', color: '#2d3436' }}>Reset</button>
-                </div>
-              </form>
-
+              <div style={{ marginTop: '1rem' }}>
+                <button type="submit" style={{ ...buttonStyle, marginRight: '1rem' }}>Get Forecast</button>
+                <button type="button" onClick={handleReset} style={buttonStyle}>Reset</button>
+              </div>
+            </form>
 
             {dynamicForecast && (
               <div>
