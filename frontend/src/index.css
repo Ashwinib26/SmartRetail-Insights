@@ -1,9 +1,17 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background: #f7f9fb;
   margin: 0;
   padding: 0;
   color: #333;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: rgb(249, 243, 235);
 }
 
 h1 {
@@ -22,6 +30,19 @@ div {
   margin: auto;
   padding: 2rem;
 }
+
+main div, section div {
+  max-width: 1000px;
+  margin: auto;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 2rem;
+}
+
 
 section {
   background: #ffffff;

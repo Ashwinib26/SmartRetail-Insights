@@ -26,7 +26,7 @@ function Home() {
   }, []);
 
   return (
-    <div style={{ padding: "2rem", fontFamily: "Arial, sans-serif" }}>
+    <div style={{ padding: "2rem", fontFamily: "Arial, sans-serif", maxWidth: "900px", margin: "0 auto" }}>
       <h1 style={{ textAlign: "center", marginBottom: "1rem" }}>
         📊 Welcome to SmartRetail Insights!
       </h1>
@@ -34,7 +34,7 @@ function Home() {
         Your smart solution for predictive sales and intelligent inventory management.
       </p>
 
-      <div style={{ position: 'relative', maxWidth: '600px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
         <img
           src={images[current].url}
           alt="Retail Banner"
@@ -48,15 +48,16 @@ function Home() {
         />
         <div
           style={{
-            position: 'absolute',
-            bottom: '15px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: 'rgba(0, 0, 0, 0.6)',
-            color: '#fff',
-            padding: '10px 20px',
+            marginTop: '16px',
+            backgroundColor: '#1e272e',
+            color: '#ffffff',
+            display: 'inline-block',
+            padding: '10px 18px',
             borderRadius: '8px',
             fontSize: '1rem',
+            fontWeight: '500',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            transition: 'all 0.3s ease-in-out'
           }}
         >
           {images[current].caption}
