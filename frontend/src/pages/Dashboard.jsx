@@ -89,6 +89,29 @@ function Dashboard() {
     }
   };
 
+  const handleReset = () => {
+    const today = new Date();
+    const randomStore = Math.floor(Math.random() * 10) + 1;
+    const randomPromo = Math.round(Math.random());
+    const randomSchoolHoliday = Math.round(Math.random());
+
+    const newDate = today.toISOString().split('T')[0];
+
+    setInputData(prev => ({
+      ...prev,
+      Store: randomStore,
+      Promo: randomPromo,
+      SchoolHoliday: randomSchoolHoliday,
+      ForecastDate: newDate,
+      Year: today.getFullYear(),
+      Month: today.getMonth() + 1,
+      Day: today.getDate(),
+      WeekOfYear: getWeekOfYear(today),
+      IsWeekend: today.getDay() === 0 || today.getDay() === 6 ? 1 : 0
+    }));
+  };
+
+
   const getWeekOfYear = (date) => {
     const oneJan = new Date(date.getFullYear(), 0, 1);
     return Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
@@ -161,26 +184,30 @@ function Dashboard() {
           </section>
 
           <section style={{ marginTop: "2rem" }}>
-            <h2>Sales Forecast (Dynamic Input)</h2>
-            <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
-              {Object.keys(inputData).map((key, idx) => {
-                const isDateField = key === 'ForecastDate';
-                return (
-                  <label key={idx} style={{ marginRight: '1rem', display: 'inline-block', width: '250px', marginBottom: '1rem' }}>
-                    {key}:
-                    <input
-                      type={isDateField ? 'date' : 'number'}
-                      name={key}
-                      value={inputData[key]}
-                      onChange={handleChange}
-                      style={{ marginLeft: '5px' }}
-                    />
-                  </label>
-                );
-              })}
+            <h2>Sales Forecast</h2>
+              <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
+                {Object.keys(inputData).map((key, idx) => {
+                  const isDateField = key === 'ForecastDate';
+                  return (
+                    <label key={idx} style={{ marginRight: '1rem', display: 'inline-block', width: '250px', marginBottom: '1rem' }}>
+                      {key}:
+                      <input
+                        type={isDateField ? 'date' : 'number'}
+                        name={key}
+                        value={inputData[key]}
+                        onChange={handleChange}
+                        style={{ marginLeft: '5px' }}
+                      />
+                    </label>
+                  );
+                })}
 
-              <br /><button type="submit" style={{ marginTop: '1rem' }}>Get Forecast</button>
-            </form>
+                <div style={{ marginTop: '1rem' }}>
+                  <button type="submit" style={{ marginRight: '1rem' }}>Get Forecast</button>
+                  <button type="button" onClick={handleReset} style={{ backgroundColor: '#b2bec3', color: '#2d3436' }}>Reset</button>
+                </div>
+              </form>
+
 
             {dynamicForecast && (
               <div>

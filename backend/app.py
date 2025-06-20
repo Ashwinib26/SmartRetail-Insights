@@ -64,9 +64,9 @@ def forecast():
         }
         prediction = make_prediction(static_data)
         return jsonify({
-            'category': 'Electronics',
+            'category': 'Grocery',
             'region': 'North',
-            'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]
+            'next_7_days_sales': [123, 123, 123, 123, 123, 123, 123]  # <-- suspicious
         })
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
