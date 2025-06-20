@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Footer from './components/Footer';
 import Auth from './pages/LoginRegister';
+import DetailedInventory from './pages/Inventory';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/detailed-inventory" element={<DetailedInventory />} />
       </Routes>
       <Footer />
     </Router>
