@@ -12,6 +12,7 @@ backend/venv/
 # Environment files
 .env
 *.env
+/dashboard/venv
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
