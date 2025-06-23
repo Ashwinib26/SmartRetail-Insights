@@ -8,10 +8,6 @@ function Inventory() {
     <div style={{ padding: '2rem' }}>
       <h1>📊 Inventory Visualizer Dashboard (via Streamlit)</h1>
 
-      <button onClick={() => navigate(-1)} style={backButtonStyle}>
-        ← Back
-      </button>
-
       <div style={iframeWrapperStyle}>
         <iframe
           src="http://localhost:8501"

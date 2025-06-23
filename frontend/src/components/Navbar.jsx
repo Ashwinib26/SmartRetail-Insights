@@ -7,7 +7,8 @@ function Navbar() {
       <div style={styles.brand}>🛒 SmartRetail Insights</div>
       <div style={styles.links}>
         <Link to="/" style={styles.link}>Home</Link>
-        <Link to="/dashboard" style={styles.link}>Dashboard</Link>
+        <Link to="/dashboard" style={styles.link}>Forecast</Link>
+        <Link to="/detailed-inventory" style={styles.link}>Inventory</Link>
       </div>
     </nav>
   );

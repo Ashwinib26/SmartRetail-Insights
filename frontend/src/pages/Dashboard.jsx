@@ -174,32 +174,7 @@ function Dashboard() {
       {isAuthenticated && (
         <>
           <section style={{ marginTop: "2rem" }}>
-            <h2>Inventory Status</h2>
-            {inventory.length > 0 ? (
-              <>
-                <ul>
-                  {inventory.map((item, index) => (
-                    <li key={index}>
-                      {item.item} — Stock: {item.stock} — {item.alert ? '⚠️ Restock Needed' : '✅ OK'}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => navigate('/detailed-inventory')}
-                  style={{
-                    marginTop: '1rem',
-                    backgroundColor: '#0984e3',
-                    color: 'white',
-                    padding: '10px 20px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  View Detailed Inventory →
-                </button>
-              </>
-            ) : <p>Loading inventory...</p>}
+            <p>Get Sales Forecast here...</p>
           </section>
 
           <section style={{ marginTop: "2rem" }}>
