@@ -58,7 +58,7 @@ CREATE TABLE inventory (
     id INT AUTO_INCREMENT PRIMARY KEY,
     item VARCHAR(255),
     category VARCHAR(100),
-    location VARCHAR(100),
+    demand INT,
     stock INT,
     alert BOOLEAN
 );

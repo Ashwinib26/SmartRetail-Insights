@@ -3,6 +3,7 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 import joblib
 import pandas as pd
+import pymysql
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -86,14 +87,28 @@ def forecast_dynamic():
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
+def get_db_connection():
+    return pymysql.connect(
+        host='localhost',
+        user='your_mysql_user',
+        password='your_password',
+        database='your_database',
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
 @app.route('/api/inventory', methods=['GET'])
 def inventory():
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
-    return jsonify([
-        {'item': 'TV', 'stock': 5, 'alert': True},
-        {'item': 'Laptop', 'stock': 20, 'alert': False}
-    ])
+
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM inventory")
+            result = cursor.fetchall()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

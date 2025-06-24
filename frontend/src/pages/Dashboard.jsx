@@ -120,6 +120,17 @@ function Dashboard() {
     marginRight: '10px'
   };
 
+  const tableHeader = {
+    padding: '10px',
+    fontWeight: 'bold',
+    borderBottom: '2px solid #ccc'
+  };
+
+  const tableCell = {
+    padding: '8px',
+    borderBottom: '1px solid #eee'
+  };
+
   return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fa", minHeight: "100vh" }}>
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>📈 Sales Forecast Dashboard</h1>
@@ -167,6 +178,37 @@ function Dashboard() {
               <p><strong>Next 7 Days Sales:</strong> {dynamicForecast.next_7_days_sales.join(', ')}</p>
             </div>
           )}
+
+          {inventory.length > 0 && (
+          <div style={sectionStyle}>
+            <h3>📦 Current Inventory Overview</h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+              <thead style={{ backgroundColor: '#dfe6e9' }}>
+                <tr>
+                  <th style={tableHeader}>Item</th>
+                  <th style={tableHeader}>Category</th>
+                  <th style={tableHeader}>Demand</th>
+                  <th style={tableHeader}>Stock</th>
+                  <th style={tableHeader}>Alert</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inventory.map((item, idx) => (
+                  <tr key={idx} style={{ textAlign: 'center' }}>
+                    <td style={tableCell}>{item.item}</td>
+                    <td style={tableCell}>{item.category}</td>
+                    <td style={tableCell}>{item.demand}</td>
+                    <td style={tableCell}>{item.stock}</td>
+                    <td style={tableCell}>
+                      {item.alert ? <span style={{ color: '#d63031' }}>⚠️ Low</span> : <span style={{ color: '#00b894' }}>✅ OK</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
         </>
       )}
     </div>
