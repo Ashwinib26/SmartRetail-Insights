@@ -106,8 +106,11 @@ def inventory():
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM inventory")
             result = cursor.fetchall()
+        connection.close()
+        print("Fetched inventory:", result)  # ✅ Add this
         return jsonify(result)
     except Exception as e:
+        print("INVENTORY FETCH ERROR:", str(e))  # ✅ Log the real reason
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
