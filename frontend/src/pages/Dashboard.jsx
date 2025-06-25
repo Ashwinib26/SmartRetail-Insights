@@ -24,6 +24,8 @@ function Dashboard() {
   });
 
   const navigate = useNavigate();
+  const [showInventory, setShowInventory] = useState(false);
+
 
   const getWeekOfYear = (date) => {
     const oneJan = new Date(date.getFullYear(), 0, 1);
@@ -166,7 +168,11 @@ function Dashboard() {
               <div style={{ marginTop: "1.5rem" }}>
                 <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
                 <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
+                <button type="button" onClick={() => setShowInventory(prev => !prev)} style={buttonStyle}>
+                  📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
+                </button>
               </div>
+
             </form>
           </div>
 
@@ -179,7 +185,7 @@ function Dashboard() {
             </div>
           )}
 
-          {inventory.length > 0 && (
+          {showInventory && inventory.length > 0 && (
           <div style={sectionStyle}>
             <h3>📦 Current Inventory Overview</h3>
             <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
