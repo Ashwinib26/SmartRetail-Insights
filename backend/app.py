@@ -90,9 +90,9 @@ def forecast_dynamic():
 def get_db_connection():
     return pymysql.connect(
         host='localhost',
-        user='your_mysql_user',
-        password='your_password',
-        database='your_database',
+        user='retail_user',
+        password='MmartRetail',
+        database='SmartRetail_Insights',
         cursorclass=pymysql.cursors.DictCursor
     )
 
