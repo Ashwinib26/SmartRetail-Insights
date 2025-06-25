@@ -9,14 +9,14 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
 CORS(app, supports_credentials=True)
 
-users_db = {}
+users_db = {}   # email -> password_hash
+roles_db = {}   # email -> role
+
 model = joblib.load('D:/projects/Final Project/SmartRetail Insights/backend/models/sales_forecast_model.pkl')
 
 def make_prediction(input_dict):
     try:
         df = pd.DataFrame([input_dict])
-
-        # ✅ For XGBRegressor, this works directly
         expected_features = model.feature_names_in_
 
         for col in expected_features:
@@ -24,43 +24,65 @@ def make_prediction(input_dict):
                 df[col] = 0
 
         df = df[expected_features]
-
         prediction = model.predict(df)[0]
         return prediction
     except Exception as e:
         print("MODEL PREDICTION ERROR:", str(e))
         raise
 
+
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
-    email, password = data.get('email'), data.get('password')
-    if not email or not password:
-        return jsonify({'error': 'Email and password required'}), 400
+    email = data.get('email')
+    password = data.get('password')
+    role = data.get('role', 'Analyst')  # Default to Analyst if not given
+
+    if not email or not password or not role:
+        return jsonify({'error': 'Email, password, and role are required'}), 400
     if email in users_db:
         return jsonify({'error': 'User already exists'}), 400
+
     users_db[email] = generate_password_hash(password)
+    roles_db[email] = role
     session['user'] = email
-    return jsonify({'message': 'Registered successfully'}), 200
+    session['role'] = role
+
+    return jsonify({'message': 'Registered successfully', 'role': role}), 200
+
 
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
-    email, password = data.get('email'), data.get('password')
-    user = users_db.get(email)
-    if not user or not check_password_hash(user, password):
+    email = data.get('email')
+    password = data.get('password')
+    role = data.get('role')
+
+    stored_password_hash = users_db.get(email)
+    stored_role = roles_db.get(email)
+
+    if not stored_password_hash or not check_password_hash(stored_password_hash, password):
         return jsonify({'error': 'Invalid credentials'}), 401
+
+    if role != stored_role:
+        return jsonify({'error': 'Incorrect role for this user'}), 403
+
     session['user'] = email
-    return jsonify({'message': 'Logged in successfully'}), 200
+    session['role'] = stored_role
+    return jsonify({'message': 'Logged in successfully', 'role': stored_role}), 200
+
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
     session.pop('user', None)
+    session.pop('role', None)
     return jsonify({'message': 'Logged out successfully'}), 200
+
 
 @app.route('/api/check-auth', methods=['GET'])
 def check_auth():
-    return jsonify({'authenticated': 'user' in session})
+    return jsonify({'authenticated': 'user' in session, 'role': session.get('role')})
+
 
 @app.route('/api/forecast', methods=['GET'])
 def forecast():
@@ -82,10 +104,11 @@ def forecast():
         return jsonify({
             'category': 'Grocery',
             'region': 'North',
-            'next_7_days_sales': [123, 123, 123, 123, 123, 123, 123]  # <-- suspicious
+            'next_7_days_sales': [123, 123, 123, 123, 123, 123, 123]
         })
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
+
 
 @app.route('/api/forecast', methods=['POST'])
 def forecast_dynamic():
@@ -102,6 +125,7 @@ def forecast_dynamic():
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
+
 def get_db_connection():
     return pymysql.connect(
         host='localhost',
@@ -110,6 +134,7 @@ def get_db_connection():
         database='SmartRetail_Insights',
         cursorclass=pymysql.cursors.DictCursor
     )
+
 
 @app.route('/api/inventory', methods=['GET'])
 def inventory():
@@ -122,11 +147,11 @@ def inventory():
             cursor.execute("SELECT * FROM inventory")
             result = cursor.fetchall()
         connection.close()
-        print("Fetched inventory:", result)  # ✅ Add this
         return jsonify(result)
     except Exception as e:
-        print("INVENTORY FETCH ERROR:", str(e))  # ✅ Log the real reason
+        print("INVENTORY FETCH ERROR:", str(e))
         return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

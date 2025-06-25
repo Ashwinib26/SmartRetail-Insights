@@ -6,15 +6,19 @@ function LoginRegister({ onSuccess }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('Analyst');
   const [error, setError] = useState('');
 
   const handleSubmit = async () => {
     const endpoint = isLogin ? 'login' : 'register';
     try {
       await axios.post(`http://localhost:5000/api/${endpoint}`, {
-        name, email, password
+        name,
+        email,
+        password,
+        role
       }, { withCredentials: true });
-      onSuccess();  // Inform Dashboard that login/register succeeded
+      onSuccess(); // Inform Dashboard that login/register succeeded
     } catch (err) {
       setError(err.response?.data?.error || 'Error occurred');
     }
@@ -31,6 +35,7 @@ function LoginRegister({ onSuccess }) {
         width: '300px', textAlign: 'center'
       }}>
         <h2>{isLogin ? 'Login' : 'Register'}</h2>
+
         {!isLogin && (
           <input
             type="text"
@@ -40,6 +45,7 @@ function LoginRegister({ onSuccess }) {
             style={{ width: '100%', marginBottom: '10px' }}
           />
         )}
+
         <input
           type="email"
           placeholder="Email"
@@ -47,6 +53,7 @@ function LoginRegister({ onSuccess }) {
           onChange={e => setEmail(e.target.value)}
           style={{ width: '100%', marginBottom: '10px' }}
         />
+
         <input
           type="password"
           placeholder="Password"
@@ -54,10 +61,23 @@ function LoginRegister({ onSuccess }) {
           onChange={e => setPassword(e.target.value)}
           style={{ width: '100%', marginBottom: '10px' }}
         />
+
+        <select
+          value={role}
+          onChange={e => setRole(e.target.value)}
+          style={{ width: '100%', marginBottom: '10px' }}
+        >
+          <option value="Analyst">Analyst</option>
+          <option value="Developer">Developer</option>
+          <option value="Admin">Admin</option>
+        </select>
+
         <button onClick={handleSubmit} style={{ width: '100%' }}>
           {isLogin ? 'Login' : 'Register'}
         </button>
+
         <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>
+
         <p style={{ marginTop: '10px' }}>
           {isLogin ? "Don't have an account?" : "Already have an account?"}
           <button onClick={() => {
