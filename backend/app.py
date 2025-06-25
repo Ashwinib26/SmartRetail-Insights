@@ -15,15 +15,16 @@ model = joblib.load('D:/projects/Final Project/SmartRetail Insights/backend/mode
 def make_prediction(input_dict):
     try:
         df = pd.DataFrame([input_dict])
-        expected_features = model.feature_name_
 
-        # Fill missing features with 0 if not provided
+        # ✅ For XGBRegressor, this works directly
+        expected_features = model.feature_names_in_
+
         for col in expected_features:
             if col not in df.columns:
                 df[col] = 0
 
-        df = df[expected_features]  # Match order
-        print("Final input to model:", df.columns.tolist())
+        df = df[expected_features]
+
         prediction = model.predict(df)[0]
         return prediction
     except Exception as e:
