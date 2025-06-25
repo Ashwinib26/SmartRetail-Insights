@@ -13,9 +13,22 @@ users_db = {}
 model = joblib.load('D:/projects/Final Project/SmartRetail Insights/backend/models/sales_forecast_model.pkl')
 
 def make_prediction(input_dict):
-    df = pd.DataFrame([input_dict])
-    prediction = model.predict(df)[0]
-    return prediction
+    try:
+        df = pd.DataFrame([input_dict])
+        expected_features = model.feature_name_
+
+        # Fill missing features with 0 if not provided
+        for col in expected_features:
+            if col not in df.columns:
+                df[col] = 0
+
+        df = df[expected_features]  # Match order
+        print("Final input to model:", df.columns.tolist())
+        prediction = model.predict(df)[0]
+        return prediction
+    except Exception as e:
+        print("MODEL PREDICTION ERROR:", str(e))
+        raise
 
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -54,15 +67,16 @@ def forecast():
         return jsonify({'error': 'Unauthorized'}), 401
     try:
         static_data = {
-            'Store': 1, 'DayOfWeek': 4, 'Promo': 1, 'SchoolHoliday': 0,
-            'StateHoliday_0': 1, 'StateHoliday_a': 0, 'StateHoliday_b': 0, 'StateHoliday_c': 0,
+            'Store': 1, 'DayOfWeek': 4, 'Open': 1, 'Promo': 1, 'SchoolHoliday': 0,
+            'CompetitionDistance': 200.0, 'CompetitionOpenSinceMonth': 9, 'CompetitionOpenSinceYear': 2010,
+            'Promo2': 1, 'Promo2SinceWeek': 13, 'Promo2SinceYear': 2015,
+            'Year': 2022, 'Month': 1, 'Day': 1, 'WeekOfYear': 1, 'IsWeekend': 0,
             'StoreType_a': 1, 'StoreType_b': 0, 'StoreType_c': 0, 'StoreType_d': 0,
             'Assortment_a': 1, 'Assortment_b': 0, 'Assortment_c': 0,
-            'Promo2': 1, 'Promo2SinceWeek': 13, 'Promo2SinceYear': 2015,
-            'CompetitionDistance': 200.0, 'CompetitionOpenSinceMonth': 9, 'CompetitionOpenSinceYear': 2010,
             'PromoInterval_Feb_May_Aug_Nov': 0, 'PromoInterval_Jan_Apr_Jul_Oct': 1,
             'PromoInterval_Mar_Jun_Sept_Dec': 0, 'PromoInterval_None': 0
         }
+
         prediction = make_prediction(static_data)
         return jsonify({
             'category': 'Grocery',

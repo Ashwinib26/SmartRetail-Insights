@@ -88,7 +88,13 @@ function Dashboard() {
   const handleSubmit = (e) => {
     e.preventDefault();
     const { ForecastDate, ...rest } = inputData;
-    const allowed = [ "Store", "DayOfWeek", "Promo", "SchoolHoliday", "StateHoliday_0", "StateHoliday_a", "StateHoliday_b", "StateHoliday_c", "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d", "Assortment_a", "Assortment_b", "Assortment_c", "Promo2", "Promo2SinceWeek", "Promo2SinceYear", "CompetitionDistance", "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear", "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct", "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None", "Open", "WeekOfYear" ];
+    const allowed = [
+      "Store", "DayOfWeek", "Open", "Promo", "SchoolHoliday", "StateHoliday_0", "StateHoliday_a", "StateHoliday_b", "StateHoliday_c",
+      "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d", "Assortment_a", "Assortment_b", "Assortment_c",
+      "Promo2", "Promo2SinceWeek", "Promo2SinceYear", "CompetitionDistance", "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear",
+      "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct", "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None",
+      "Year", "Month", "Day", "WeekOfYear", "IsWeekend"
+    ];
     const modelInput = Object.fromEntries(Object.entries(rest).filter(([k]) => allowed.includes(k)));
 
     axios.post('http://localhost:5000/api/forecast', modelInput, { withCredentials: true })
