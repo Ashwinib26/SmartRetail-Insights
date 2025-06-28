@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
-import 'D:/projects/Final Project/SmartRetail Insights/frontend/src/index.css';
 
 function Dashboard() {
-  const [forecast, setForecast] = useState(null);
-  const [dynamicForecast, setDynamicForecast] = useState(null);
-  const [inventory, setInventory] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+
+  const [forecast, setForecast] = useState(null);
+  const [inventory, setInventory] = useState([]);
+  const [dynamicForecast, setDynamicForecast] = useState(null);
+
+  const [showInventory, setShowInventory] = useState(false);
   const [inputData, setInputData] = useState({
     Store: 1, DayOfWeek: 4, Promo: 1, SchoolHoliday: 0,
     StateHoliday_0: 1, StateHoliday_a: 0, StateHoliday_b: 0, StateHoliday_c: 0,
@@ -23,30 +25,44 @@ function Dashboard() {
     ForecastDate: '2022-01-01'
   });
 
-  const navigate = useNavigate();
-  const [showInventory, setShowInventory] = useState(false);
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
+      .then(res => {
+        if (res.data.authenticated) {
+          setIsAuthenticated(true);
+          setRole(res.data.role);
+        } else {
+          setShowPopup(true);
+        }
+      })
+      .catch(() => setShowPopup(true));
+  }, []);
 
+  useEffect(() => {
+    if (isAuthenticated && role) {
+      if (role === 'Developer' || role === 'Admin') {
+        axios.get('http://localhost:5000/api/forecast', { withCredentials: true })
+          .then(res => setForecast(res.data));
+      }
+    }
+  }, [isAuthenticated, role]);
+
+  const fetchInventory = () => {
+    axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
+      .then(res => setInventory(res.data));
+  };
+
+  const handleToggleInventory = () => {
+    if (!showInventory) {
+      fetchInventory();
+    }
+    setShowInventory(prev => !prev);
+  };
 
   const getWeekOfYear = (date) => {
     const oneJan = new Date(date.getFullYear(), 0, 1);
     return Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
   };
-
-  useEffect(() => {
-    axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
-      .then(res => {
-        res.data.authenticated ? setIsAuthenticated(true) : setShowPopup(true);
-      }).catch(() => setShowPopup(true));
-  }, []);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      axios.get('http://localhost:5000/api/forecast', { withCredentials: true })
-        .then(res => setForecast(res.data));
-      axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
-        .then(res => setInventory(res.data));
-    }
-  }, [isAuthenticated]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -141,86 +157,103 @@ function Dashboard() {
 
   return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fa", minHeight: "100vh" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>📈 Sales Forecast Dashboard</h1>
+      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>📈 SmartRetail Insights Dashboard</h1>
 
-      {showPopup && <LoginRegister onSuccess={() => { setIsAuthenticated(true); setShowPopup(false); }} />}
+      {showPopup && (
+        <LoginRegister
+          onSuccess={() => {
+            setIsAuthenticated(true);
+            setShowPopup(false);
+            axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
+              .then(res => setRole(res.data.role));
+          }}
+        />
+      )}
 
       {isAuthenticated && (
         <>
-          <div style={sectionStyle}>
-            <p style={{ fontSize: "1.1rem" }}>
-              Configure the parameters to forecast upcoming sales based on store, promo, holidays, and more.
-            </p>
-          </div>
+          {(role === 'Developer' || role === 'Admin') && (
+            <>
+              <div style={sectionStyle}>
+                <p>Configure the parameters to forecast upcoming sales.</p>
+              </div>
 
-          <div style={sectionStyle}>
-            <h2> Forecast Parameters</h2>
-            <form onSubmit={handleSubmit}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-                {Object.keys(inputData).map((key, i) => (
-                  <div key={i}>
-                    <label style={{ fontWeight: "500" }}>{key}</label>
-                    <input
-                      type={key === "ForecastDate" ? "date" : "number"}
-                      name={key}
-                      value={inputData[key]}
-                      onChange={handleChange}
-                      style={inputStyle}
-                    />
+              <div style={sectionStyle}>
+                <h2>Forecast Parameters</h2>
+                <form onSubmit={handleSubmit}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+                    {Object.keys(inputData).map((key, i) => (
+                      <div key={i}>
+                        <label style={{ fontWeight: "500" }}>{key}</label>
+                        <input
+                          type={key === "ForecastDate" ? "date" : "number"}
+                          name={key}
+                          value={inputData[key]}
+                          onChange={handleChange}
+                          style={inputStyle}
+                        />
+                      </div>
+                    ))}
                   </div>
-                ))}
+
+                  <div style={{ marginTop: "1.5rem" }}>
+                    <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
+                    <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
+                    <button onClick={() => setShowInventory(prev => !prev)} style={buttonStyle}>
+                      📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
+                    </button>
+                  </div>
+                </form>
               </div>
 
-              <div style={{ marginTop: "1.5rem" }}>
-                <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
-                <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
-                <button type="button" onClick={() => setShowInventory(prev => !prev)} style={buttonStyle}>
-                  📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
-                </button>
-              </div>
-
-            </form>
-          </div>
-
-          {dynamicForecast && (
-            <div style={sectionStyle}>
-              <h3>📅 Forecast Result</h3>
-              <p><strong>Category:</strong> {dynamicForecast.category}</p>
-              <p><strong>Region:</strong> {dynamicForecast.region}</p>
-              <p><strong>Next 7 Days Sales:</strong> {dynamicForecast.next_7_days_sales.join(', ')}</p>
-            </div>
+              {dynamicForecast && (
+                <div style={sectionStyle}>
+                  <h3>📅 Forecast Result</h3>
+                  <p><strong>Category:</strong> {dynamicForecast.category}</p>
+                  <p><strong>Region:</strong> {dynamicForecast.region}</p>
+                  <p><strong>Next 7 Days Sales:</strong> {dynamicForecast.next_7_days_sales.join(', ')}</p>
+                </div>
+              )}
+            </>
           )}
 
-          {showInventory && inventory.length > 0 && (
-          <div style={sectionStyle}>
-            <h3>📦 Current Inventory Overview</h3>
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-              <thead style={{ backgroundColor: '#dfe6e9' }}>
-                <tr>
-                  <th style={tableHeader}>Item</th>
-                  <th style={tableHeader}>Category</th>
-                  <th style={tableHeader}>Demand</th>
-                  <th style={tableHeader}>Stock</th>
-                  <th style={tableHeader}>Alert</th>
-                </tr>
-              </thead>
-              <tbody>
-                {inventory.map((item, idx) => (
-                  <tr key={idx} style={{ textAlign: 'center' }}>
-                    <td style={tableCell}>{item.item}</td>
-                    <td style={tableCell}>{item.category}</td>
-                    <td style={tableCell}>{item.demand}</td>
-                    <td style={tableCell}>{item.stock}</td>
-                    <td style={tableCell}>
-                      {item.alert ? <span style={{ color: '#d63031' }}>⚠️ Low</span> : <span style={{ color: '#00b894' }}>✅ OK</span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+          {(role === 'Analyst' || role === 'Admin') && (
+            <>
+              <button onClick={handleToggleInventory} style={buttonStyle}>
+                📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
+              </button>
 
+              {showInventory && (
+                <div style={sectionStyle}>
+                  <h3>📦 Current Inventory Overview</h3>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                    <thead style={{ backgroundColor: '#dfe6e9' }}>
+                      <tr>
+                        <th style={tableHeader}>Item</th>
+                        <th style={tableHeader}>Category</th>
+                        <th style={tableHeader}>Demand</th>
+                        <th style={tableHeader}>Stock</th>
+                        <th style={tableHeader}>Alert</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {inventory.map((item, idx) => (
+                        <tr key={idx} style={{ textAlign: 'center' }}>
+                          <td style={tableCell}>{item.item}</td>
+                          <td style={tableCell}>{item.category}</td>
+                          <td style={tableCell}>{item.demand}</td>
+                          <td style={tableCell}>{item.stock}</td>
+                          <td style={tableCell}>
+                            {item.alert ? <span style={{ color: '#d63031' }}>⚠️ Low</span> : <span style={{ color: '#00b894' }}>✅ OK</span>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
         </>
       )}
     </div>
