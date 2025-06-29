@@ -160,14 +160,12 @@ function Dashboard() {
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>📈 SmartRetail Insights Dashboard</h1>
 
       {showPopup && (
-        <LoginRegister
-          onSuccess={() => {
-            setIsAuthenticated(true);
-            setShowPopup(false);
-            axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
-              .then(res => setRole(res.data.role));
-          }}
-        />
+        <LoginRegister onSuccess={() => {
+          setIsAuthenticated(true);
+          setShowPopup(false);
+          axios.get('/api/check-auth', { withCredentials: true })
+            .then(res => setRole(res.data.role));
+        }} />
       )}
 
       {isAuthenticated && (

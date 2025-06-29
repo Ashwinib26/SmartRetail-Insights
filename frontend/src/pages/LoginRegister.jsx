@@ -14,35 +14,27 @@ function LoginRegister({ onSuccess }) {
 
   const handleSubmit = async () => {
     const endpoint = isLogin ? 'login' : 'register';
-
     const payload = isLogin
-      ? {
-          email: email.trim(),
-          password: password.trim(),
-          role: normalizeRole(role)
-        }
-      : {
-          name: name.trim(),
-          email: email.trim(),
-          password: password.trim(),
-          role: normalizeRole(role)
-        };
+      ? { email, password, role: normalizeRole(role) }
+      : { name, email, password, role: normalizeRole(role) };
 
-    console.log('🚀 Submitting to:', endpoint);
-    console.log('🔍 Payload:', payload);
+    console.log('Sending payload:', payload);
 
     try {
-      const res = await axios.post(
-        `http://localhost:5000/api/${endpoint}`,
-        payload,
-        { withCredentials: true }
-      );
-      console.log('✅ Response:', res.data);
-      onSuccess();
+      const response = await axios.post(`http://localhost:5000/api/${endpoint}`, payload, {
+        withCredentials: true,
+      });
+      console.log('✅ Response:', response.data);
+
+      if (onSuccess && typeof onSuccess === 'function') {
+        onSuccess();
+      } else {
+        console.log('⚠️ onSuccess not provided');
+      }
     } catch (err) {
-      console.error('❌ Axios Error:', err);
-      console.error('❌ Response:', err.response?.data);
-      setError(err.response?.data?.error || 'Login/Register failed.');
+      console.log('❌ Axios Error:', err);
+      console.log('❌ Response:', err.response);
+      setError(err.response?.data?.error || 'Error occurred');
     }
   };
 
