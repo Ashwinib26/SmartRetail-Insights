@@ -9,6 +9,7 @@ function Navbar() {
         <Link to="/" style={styles.link}>Home</Link>
         <Link to="/dashboard" style={styles.link}>Forecast</Link>
         <Link to="/detailed-inventory" style={styles.link}>Inventory</Link>
+        <Link to="/auth" style={styles.link}>Login</Link>
       </div>
     </nav>
   );

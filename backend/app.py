@@ -34,21 +34,37 @@ def make_prediction(input_dict):
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
+    name = data.get('name')
     email = data.get('email')
     password = data.get('password')
-    role = data.get('role', 'Analyst')  # Default to Analyst if not given
+    role = data.get('role', 'Analyst')
 
-    if not email or not password or not role:
-        return jsonify({'error': 'Email, password, and role are required'}), 400
-    if email in users_db:
-        return jsonify({'error': 'User already exists'}), 400
+    if not email or not password or not role or not name:
+        return jsonify({'error': 'Name, email, password, role are required'}), 400
 
-    users_db[email] = generate_password_hash(password)
-    roles_db[email] = role
-    session['user'] = email
-    session['role'] = role
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+            existing_user = cursor.fetchone()
+            if existing_user:
+                return jsonify({'error': 'User already exists'}), 400
 
-    return jsonify({'message': 'Registered successfully', 'role': role}), 200
+            hashed = generate_password_hash(password)
+            cursor.execute(
+                "INSERT INTO users (name, email, password_hash, role) VALUES (%s, %s, %s, %s)",
+                (name, email, hashed, role)
+            )
+            connection.commit()
+        connection.close()
+
+        session['user'] = email
+        session['role'] = role
+        return jsonify({'message': 'Registered successfully', 'role': role}), 200
+
+    except Exception as e:
+        print("REGISTER ERROR:", str(e))
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/login', methods=['POST'])
@@ -56,20 +72,31 @@ def login():
     data = request.json
     email = data.get('email')
     password = data.get('password')
-    role = data.get('role')
 
-    stored_password_hash = users_db.get(email)
-    stored_role = roles_db.get(email)
+    if not email or not password:
+        return jsonify({'error': 'Email & password required'}), 400
 
-    if not stored_password_hash or not check_password_hash(stored_password_hash, password):
-        return jsonify({'error': 'Invalid credentials'}), 401
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+            user = cursor.fetchone()
+        connection.close()
 
-    if role != stored_role:
-        return jsonify({'error': 'Incorrect role for this user'}), 403
+        if not user:
+            return jsonify({'error': 'Invalid credentials'}), 401
 
-    session['user'] = email
-    session['role'] = stored_role
-    return jsonify({'message': 'Logged in successfully', 'role': stored_role}), 200
+        stored_hash = user['password_hash']
+        if not check_password_hash(stored_hash, password):
+            return jsonify({'error': 'Invalid credentials'}), 401
+
+        session['user'] = email
+        session['role'] = user['role']
+        return jsonify({'message': 'Logged in', 'role': user['role']}), 200
+
+    except Exception as e:
+        print("LOGIN ERROR:", str(e))
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/logout', methods=['POST'])
