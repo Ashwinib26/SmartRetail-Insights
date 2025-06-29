@@ -70,33 +70,37 @@ def register():
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
+    print('Login data received:', data)
     email = data.get('email')
     password = data.get('password')
+    role = data.get('role')
 
-    if not email or not password:
-        return jsonify({'error': 'Email & password required'}), 400
-
+    connection = get_db_connection()
     try:
-        connection = get_db_connection()
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
             user = cursor.fetchone()
-        connection.close()
+        print('User fetched:', user)
 
         if not user:
             return jsonify({'error': 'Invalid credentials'}), 401
 
-        stored_hash = user['password_hash']
-        if not check_password_hash(stored_hash, password):
+        stored_password = user['password']
+        stored_role = user['role']
+
+        if stored_password != password:
             return jsonify({'error': 'Invalid credentials'}), 401
 
-        session['user'] = email
-        session['role'] = user['role']
-        return jsonify({'message': 'Logged in', 'role': user['role']}), 200
+        if role.lower() != stored_role.lower():
+            return jsonify({'error': 'Incorrect role for this user'}), 403
 
-    except Exception as e:
-        print("LOGIN ERROR:", str(e))
-        return jsonify({'error': str(e)}), 500
+        session['user'] = email
+        session['role'] = stored_role
+        return jsonify({'message': 'Logged in successfully', 'role': stored_role}), 200
+
+    finally:
+        connection.close()
+
 
 
 @app.route('/api/logout', methods=['POST'])
