@@ -27,7 +27,7 @@ function LoginRegister({ onSuccess }) {
       console.log('✅ Response:', response.data);
 
       if (onSuccess && typeof onSuccess === 'function') {
-        onSuccess();
+        onSuccess(response.data);
       } else {
         console.log('⚠️ onSuccess not provided');
       }

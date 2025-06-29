@@ -5,6 +5,7 @@ import LoginRegister from './LoginRegister';
 function Dashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState(null);
+  const [user, setUser] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
   const [forecast, setForecast] = useState(null);
@@ -160,12 +161,13 @@ function Dashboard() {
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>📈 SmartRetail Insights Dashboard</h1>
 
       {showPopup && (
-        <LoginRegister onSuccess={() => {
+        <LoginRegister onSuccess={(userData) => {
           setIsAuthenticated(true);
           setShowPopup(false);
-          axios.get('/api/check-auth', { withCredentials: true })
-            .then(res => setRole(res.data.role));
+          setUser(userData.name);  // ✅ set logged-in user name
+          setRole(userData.role);  // ✅ store role too if needed
         }} />
+
       )}
 
       {isAuthenticated && (

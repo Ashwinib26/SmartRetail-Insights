@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function Navbar() {
+function Navbar({ user }) {
   return (
     <nav style={styles.navbar}>
       <div style={styles.brand}>🛒 SmartRetail Insights</div>
@@ -9,7 +9,11 @@ function Navbar() {
         <Link to="/" style={styles.link}>Home</Link>
         <Link to="/dashboard" style={styles.link}>Forecast</Link>
         <Link to="/detailed-inventory" style={styles.link}>Inventory</Link>
-        <Link to="/auth" style={styles.link}>Login</Link>
+        {user ? (
+          <span style={styles.link}>👤 {user}</span>
+        ) : (
+          <Link to="/auth" style={styles.link}>Login</Link>
+        )}
       </div>
     </nav>
   );
