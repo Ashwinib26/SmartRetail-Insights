@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
@@ -9,15 +9,19 @@ import Auth from './pages/LoginRegister';
 import DetailedInventory from './pages/Inventory';
 
 function App() {
+  const [user, setUser] = useState(null);
+
   return (
     <Router>
-      <Navbar />
+      <Navbar user={user} />
+
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/auth" element={<Auth />} />
+        <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} />} />
+        <Route path="/auth" element={<Auth setUser={setUser} />} />
         <Route path="/detailed-inventory" element={<DetailedInventory />} />
       </Routes>
+
       <Footer />
     </Router>
   );

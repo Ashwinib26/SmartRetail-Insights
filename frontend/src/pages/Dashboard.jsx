@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
 
-function Dashboard() {
+function Dashboard({ user, setUser }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState(null);
-  const [user, setUser] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
 
   const [forecast, setForecast] = useState(null);
@@ -34,13 +33,13 @@ function Dashboard() {
         if (res.data.authenticated) {
           setIsAuthenticated(true);
           setRole(res.data.role);
-          setUser(res.data.name || null);
+          setUser(res.data.name || null); // ✅ use prop-setter
         } else {
           setShowPopup(true);
         }
       })
       .catch(() => setShowPopup(true));
-  }, []);
+  }, [setUser]);
 
   useEffect(() => {
     if (isAuthenticated && role) {
@@ -169,7 +168,7 @@ function Dashboard() {
         <LoginRegister onSuccess={() => {
           axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
             .then(res => {
-              setUser(res.data.name);
+              setUser(res.data.name); // ✅ use prop-setter
               setRole(res.data.role);
               setIsAuthenticated(true);
               setShowPopup(false);

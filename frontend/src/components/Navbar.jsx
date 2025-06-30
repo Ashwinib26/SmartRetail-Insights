@@ -1,7 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 function Navbar({ user }) {
+  const [userDetails, setUserDetails] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+
+  const fetchUserDetails = async () => {
+    const res = await axios.get('http://localhost:5000/api/user-details', { withCredentials: true });
+    setUserDetails(res.data);
+    setShowPopup(true);
+  };
+
   return (
     <nav style={styles.navbar}>
       <div style={styles.brand}>🛒 SmartRetail Insights</div>
@@ -10,11 +20,23 @@ function Navbar({ user }) {
         <Link to="/dashboard" style={styles.link}>Forecast</Link>
         <Link to="/detailed-inventory" style={styles.link}>Inventory</Link>
         {user ? (
-          <span style={styles.link}>👤 {user}</span>
+          <span style={{ ...styles.link, cursor: 'pointer' }} onClick={fetchUserDetails}>
+            👤
+          </span>
         ) : (
           <Link to="/auth" style={styles.link}>Login</Link>
         )}
       </div>
+
+      {showPopup && userDetails && (
+        <div style={styles.popup}>
+          <h4>User Details</h4>
+          <p><strong>Name:</strong> {userDetails.name}</p>
+          <p><strong>Email:</strong> {userDetails.email}</p>
+          <p><strong>Role:</strong> {userDetails.role}</p>
+          <button onClick={() => setShowPopup(false)}>Close</button>
+        </div>
+      )}
     </nav>
   );
 }
@@ -22,7 +44,7 @@ function Navbar({ user }) {
 const styles = {
   navbar: {
     backgroundColor: '#1e272e',
-    height: '64px', // slightly more for vertical padding + emojis
+    height: '64px',
     width: '100%',
     display: 'flex',
     justifyContent: 'space-between',
@@ -37,13 +59,7 @@ const styles = {
   },
   brand: {
     fontSize: '1.1rem',
-    fontWeight: 600,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    maxWidth: '300px', // increased
-    lineHeight: '1',
-    color: 'white' // ensure it's not blending in
+    fontWeight: 600
   },
   links: {
     display: 'flex',
@@ -55,7 +71,17 @@ const styles = {
     color: 'white',
     textDecoration: 'none',
     transition: 'color 0.3s ease',
-    lineHeight: 'normal'
+    cursor: 'pointer'
+  },
+  popup: {
+    position: 'absolute',
+    top: '64px',
+    right: '1rem',
+    backgroundColor: 'white',
+    color: '#1e272e',
+    padding: '1rem',
+    borderRadius: '8px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
   }
 };
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function LoginRegister({ onSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -10,6 +11,8 @@ function LoginRegister({ onSuccess }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const navigate = useNavigate(); // ADD THIS
+
   const normalizeRole = (r) => r.toLowerCase();
 
   const handleSubmit = async () => {
@@ -18,8 +21,6 @@ function LoginRegister({ onSuccess }) {
       ? { email, password, role: normalizeRole(role) }
       : { name, email, password, role: normalizeRole(role) };
 
-    console.log('👉 Sending payload:', payload);
-
     try {
       const response = await axios.post(
         `http://localhost:5000/api/${endpoint}`,
@@ -27,21 +28,17 @@ function LoginRegister({ onSuccess }) {
         { withCredentials: true }
       );
 
-      console.log('✅ API Response:', response.data);
-
-      // show success message locally
       setSuccess(response.data.message || 'Login successful!');
       setError('');
 
       if (onSuccess && typeof onSuccess === 'function') {
-        onSuccess(response.data); // pass whole response
-      } else {
-        console.warn('⚠️ onSuccess not provided');
+        onSuccess(response.data);
       }
 
+      // ✅ Redirect to home page
+      navigate('/');
+
     } catch (err) {
-      console.log('❌ Axios Error:', err);
-      console.log('❌ Response:', err.response);
       setError(err.response?.data?.error || 'Something went wrong');
       setSuccess('');
     }
@@ -113,17 +110,8 @@ function LoginRegister({ onSuccess }) {
           {isLogin ? 'Login' : 'Register'}
         </button>
 
-        {success && (
-          <p style={{ color: 'green', marginTop: '10px' }}>
-            ✅ {success}
-          </p>
-        )}
-
-        {error && (
-          <p style={{ color: 'red', marginTop: '10px' }}>
-            ⚠️ {error}
-          </p>
-        )}
+        {success && <p style={{ color: 'green', marginTop: '10px' }}>✅ {success}</p>}
+        {error && <p style={{ color: 'red', marginTop: '10px' }}>⚠️ {error}</p>}
 
         <p style={{ marginTop: '10px' }}>
           {isLogin ? "Don't have an account?" : 'Already have an account?'}

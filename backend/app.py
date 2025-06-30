@@ -166,6 +166,20 @@ def get_db_connection():
         cursorclass=pymysql.cursors.DictCursor
     )
 
+@app.route('/api/user-details', methods=['GET'])
+def user_details():
+    if 'user' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    email = session['user']
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT name, email, role FROM users WHERE email=%s", (email,))
+            user = cursor.fetchone()
+        return jsonify(user)
+    finally:
+        connection.close()
 
 @app.route('/api/inventory', methods=['GET'])
 def inventory():
