@@ -32,6 +32,7 @@ function Dashboard() {
         if (res.data.authenticated) {
           setIsAuthenticated(true);
           setRole(res.data.role);
+          setUser(res.data.name || null);
         } else {
           setShowPopup(true);
         }
@@ -158,16 +159,18 @@ function Dashboard() {
 
   return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fa", minHeight: "100vh" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>📈 SmartRetail Insights Dashboard</h1>
+      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+        📈 SmartRetail Insights Dashboard {user ? ` | 👤 ${user}` : ''}
+      </h1>
 
       {showPopup && (
-        <LoginRegister onSuccess={(userData) => {
-          setIsAuthenticated(true);
+        <LoginRegister onSuccess={(data) => {
+          console.log('📣 Parent got data:', data);
+          setUser(data.name); // sets your user
           setShowPopup(false);
-          setUser(userData.name);  // ✅ set logged-in user name
-          setRole(userData.role);  // ✅ store role too if needed
+          setRole(data.role);
+          setIsAuthenticated(true);  // ✅ FIXED: mark as authenticated!
         }} />
-
       )}
 
       {isAuthenticated && (

@@ -8,8 +8,8 @@ function LoginRegister({ onSuccess }) {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('Analyst');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  // Always normalize role to match DB format exactly
   const normalizeRole = (r) => r.toLowerCase();
 
   const handleSubmit = async () => {
@@ -18,23 +18,32 @@ function LoginRegister({ onSuccess }) {
       ? { email, password, role: normalizeRole(role) }
       : { name, email, password, role: normalizeRole(role) };
 
-    console.log('Sending payload:', payload);
+    console.log('👉 Sending payload:', payload);
 
     try {
-      const response = await axios.post(`http://localhost:5000/api/${endpoint}`, payload, {
-        withCredentials: true,
-      });
-      console.log('✅ Response:', response.data);
+      const response = await axios.post(
+        `http://localhost:5000/api/${endpoint}`,
+        payload,
+        { withCredentials: true }
+      );
+
+      console.log('✅ API Response:', response.data);
+
+      // show success message locally
+      setSuccess(response.data.message || 'Login successful!');
+      setError('');
 
       if (onSuccess && typeof onSuccess === 'function') {
-        onSuccess(response.data);
+        onSuccess(response.data); // pass whole response
       } else {
-        console.log('⚠️ onSuccess not provided');
+        console.warn('⚠️ onSuccess not provided');
       }
+
     } catch (err) {
       console.log('❌ Axios Error:', err);
       console.log('❌ Response:', err.response);
-      setError(err.response?.data?.error || 'Error occurred');
+      setError(err.response?.data?.error || 'Something went wrong');
+      setSuccess('');
     }
   };
 
@@ -104,6 +113,12 @@ function LoginRegister({ onSuccess }) {
           {isLogin ? 'Login' : 'Register'}
         </button>
 
+        {success && (
+          <p style={{ color: 'green', marginTop: '10px' }}>
+            ✅ {success}
+          </p>
+        )}
+
         {error && (
           <p style={{ color: 'red', marginTop: '10px' }}>
             ⚠️ {error}
@@ -116,6 +131,7 @@ function LoginRegister({ onSuccess }) {
             onClick={() => {
               setIsLogin(!isLogin);
               setError('');
+              setSuccess('');
             }}
             style={{ marginLeft: '5px' }}
           >
