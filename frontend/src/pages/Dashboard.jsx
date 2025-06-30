@@ -12,6 +12,8 @@ function Dashboard() {
   const [inventory, setInventory] = useState([]);
   const [dynamicForecast, setDynamicForecast] = useState(null);
 
+  const normalizedRole = role ? role.toLowerCase() : '';
+
   const [showInventory, setShowInventory] = useState(false);
   const [inputData, setInputData] = useState({
     Store: 1, DayOfWeek: 4, Promo: 1, SchoolHoliday: 0,
@@ -42,12 +44,12 @@ function Dashboard() {
 
   useEffect(() => {
     if (isAuthenticated && role) {
-      if (role === 'Developer' || role === 'Admin') {
+      if (normalizedRole === 'developer' || normalizedRole === 'admin') {
         axios.get('http://localhost:5000/api/forecast', { withCredentials: true })
           .then(res => setForecast(res.data));
       }
     }
-  }, [isAuthenticated, role]);
+  }, [isAuthenticated, normalizedRole]);
 
   const fetchInventory = () => {
     axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
@@ -164,18 +166,24 @@ function Dashboard() {
       </h1>
 
       {showPopup && (
-        <LoginRegister onSuccess={(data) => {
-          console.log('📣 Parent got data:', data);
-          setUser(data.name); // sets your user
-          setShowPopup(false);
-          setRole(data.role);
-          setIsAuthenticated(true);  // ✅ FIXED: mark as authenticated!
-        }} />
+        <LoginRegister onSuccess={() => {
+          axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
+            .then(res => {
+              setUser(res.data.name);
+              setRole(res.data.role);
+              setIsAuthenticated(true);
+              setShowPopup(false);
+            })
+            .catch(err => {
+              console.error('Auth check after login failed:', err);
+              setShowPopup(true);
+            });
+        }}/>
       )}
 
       {isAuthenticated && (
         <>
-          {(role === 'Developer' || role === 'Admin') && (
+          {(['developer', 'admin'].includes(normalizedRole)) && (
             <>
               <div style={sectionStyle}>
                 <p>Configure the parameters to forecast upcoming sales.</p>
@@ -202,7 +210,7 @@ function Dashboard() {
                   <div style={{ marginTop: "1.5rem" }}>
                     <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
                     <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
-                    <button onClick={() => setShowInventory(prev => !prev)} style={buttonStyle}>
+                    <button onClick={handleToggleInventory} style={buttonStyle}>
                       📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
                     </button>
                   </div>
@@ -217,14 +225,6 @@ function Dashboard() {
                   <p><strong>Next 7 Days Sales:</strong> {dynamicForecast.next_7_days_sales.join(', ')}</p>
                 </div>
               )}
-            </>
-          )}
-
-          {(role === 'Analyst' || role === 'Admin') && (
-            <>
-              <button onClick={handleToggleInventory} style={buttonStyle}>
-                📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
-              </button>
 
               {showInventory && (
                 <div style={sectionStyle}>
