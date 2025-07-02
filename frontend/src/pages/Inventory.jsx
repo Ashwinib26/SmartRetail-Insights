@@ -59,6 +59,10 @@ function Inventory() {
         />
       )}
 
+      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+        📈 SmartRetail Insights : Analysis Dashboard 
+      </h1>
+
       {isAuthenticated && (role?.toLowerCase() === 'analyst' || role?.toLowerCase() === 'admin') && (
         <iframe
           src="http://localhost:8501"
