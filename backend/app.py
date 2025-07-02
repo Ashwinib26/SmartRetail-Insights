@@ -96,11 +96,14 @@ def login():
 
         session['user'] = email
         session['role'] = stored_role
-        return jsonify({'message': 'Logged in successfully', 'role': stored_role}), 200
+        return jsonify({
+            'message': 'Logged in successfully',
+            'role': stored_role,
+            'name': user['name'] 
+        }), 200
 
     finally:
         connection.close()
-
 
 
 @app.route('/api/logout', methods=['POST'])
@@ -112,7 +115,20 @@ def logout():
 
 @app.route('/api/check-auth', methods=['GET'])
 def check_auth():
-    return jsonify({'authenticated': 'user' in session, 'role': session.get('role')})
+    if 'user' not in session:
+        return jsonify({'authenticated': False})
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT name FROM users WHERE email = %s", (session['user'],))
+            user = cursor.fetchone()
+        return jsonify({
+            'authenticated': True,
+            'role': session.get('role'),
+            'name': user['name']  
+        })
+    finally:
+        connection.close()
 
 
 @app.route('/api/forecast', methods=['GET'])
@@ -171,11 +187,10 @@ def user_details():
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
 
-    email = session['user']
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT name, email, role FROM users WHERE email=%s", (email,))
+            cursor.execute("SELECT name, email, role FROM users WHERE email = %s", (session['user'],))
             user = cursor.fetchone()
         return jsonify(user)
     finally:

@@ -28,18 +28,18 @@ function Dashboard({ user, setUser }) {
   });
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
-      .then(res => {
-        if (res.data.authenticated) {
-          setIsAuthenticated(true);
-          setRole(res.data.role);
-          setUser(res.data.name || null); // ✅ use prop-setter
-        } else {
-          setShowPopup(true);
-        }
-      })
-      .catch(() => setShowPopup(true));
-  }, [setUser]);
+  axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
+    .then(res => {
+      if (res.data.authenticated) {
+        setIsAuthenticated(true);
+        setRole(res.data.role);
+        setUser(res.data.name); 
+      } else {
+        setShowPopup(true);
+      }
+    })
+    .catch(() => setShowPopup(true));
+}, []);
 
   useEffect(() => {
     if (isAuthenticated && role) {
@@ -168,14 +168,9 @@ function Dashboard({ user, setUser }) {
         <LoginRegister onSuccess={() => {
           axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
             .then(res => {
-              setUser(res.data.name); // ✅ use prop-setter
-              setRole(res.data.role);
-              setIsAuthenticated(true);
-              setShowPopup(false);
-            })
-            .catch(err => {
-              console.error('Auth check after login failed:', err);
-              setShowPopup(true);
+              if (res.data.authenticated) {
+                setUser(res.data.name); // set the logged in name!
+              }
             });
         }}/>
       )}

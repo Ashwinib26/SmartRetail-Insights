@@ -14,14 +14,12 @@ function App() {
   return (
     <Router>
       <Navbar user={user} />
-
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard user={user} setUser={setUser} />} />
+        <Route path="/dashboard" element={<Dashboard setUser={setUser} />} />
         <Route path="/auth" element={<Auth setUser={setUser} />} />
         <Route path="/detailed-inventory" element={<DetailedInventory />} />
       </Routes>
-
       <Footer />
     </Router>
   );

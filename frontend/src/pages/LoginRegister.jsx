@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function LoginRegister({ onSuccess }) {
+function LoginRegister({ onSuccess , setUser }) {
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,13 +29,13 @@ function LoginRegister({ onSuccess }) {
       );
 
       setSuccess(response.data.message || 'Login successful!');
+      setUser(response.data.name);
       setError('');
 
       if (onSuccess && typeof onSuccess === 'function') {
         onSuccess(response.data);
       }
 
-      // ✅ Redirect to home page
       navigate('/');
 
     } catch (err) {
