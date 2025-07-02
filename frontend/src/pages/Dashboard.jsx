@@ -137,7 +137,7 @@ function Dashboard({ user, setUser }) {
   };
 
   const buttonStyle = {
-    backgroundColor: '#0984e3',
+    backgroundColor: '#1e272e',
     color: '#fff',
     padding: '10px 20px',
     fontSize: '1rem',
@@ -161,7 +161,7 @@ function Dashboard({ user, setUser }) {
   return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fa", minHeight: "100vh" }}>
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        📈 SmartRetail Insights Dashboard {user ? ` | 👤 ${user}` : ''}
+        📈 SmartRetail Insights : Forecast and Inventory {user ? ` | 👤 ${user}` : ''}
       </h1>
 
       {showPopup && (
