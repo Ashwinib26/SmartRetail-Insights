@@ -40,12 +40,13 @@ function Navbar({ user , setUser }) {
 
       {showPopup && userDetails && (
         <div style={styles.popup}>
-          <h4>User Details</h4>
           <p><strong>Name:</strong> {userDetails.name}</p>
           <p><strong>Email:</strong> {userDetails.email}</p>
           <p><strong>Role:</strong> {userDetails.role}</p>
-          <button onClick={() => setShowPopup(false)}>Close</button>
-          <button onClick={handleLogout}>Logout</button>
+          <div style={{ marginTop: '1rem' }}>
+            <button style={styles.button} onClick={() => setShowPopup(false)}>Close</button>
+            <button style={styles.button} onClick={handleLogout}>Logout</button>
+          </div>
         </div>
       )}
     </nav>
@@ -72,6 +73,16 @@ const styles = {
     fontSize: '1.1rem',
     fontWeight: 600
   },
+  popup: {
+    position: 'absolute',
+    top: '64px',
+    right: '1rem',
+    backgroundColor: '#f5f5f5', // light gray background
+    color: '#4a545c',
+    padding: '1rem',
+    borderRadius: '8px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+  },
   links: {
     display: 'flex',
     gap: '1rem',
@@ -84,15 +95,16 @@ const styles = {
     transition: 'color 0.3s ease',
     cursor: 'pointer'
   },
-  popup: {
-    position: 'absolute',
-    top: '64px',
-    right: '1rem',
-    backgroundColor: 'white',
-    color: '#1e272e',
-    padding: '1rem',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+  button: {
+    backgroundColor: '#1e272e',
+    color: '#fff',
+    padding: '8px 16px',
+    fontSize: '0.9rem',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    marginRight: '10px',
+    transition: 'background 0.3s ease'
   }
 };
 
