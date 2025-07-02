@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate} from 'react-router-dom';
 import axios from 'axios';
+import { FaUserCircle } from 'react-icons/fa';
 
 function Navbar({ user , setUser }) {
   const [userDetails, setUserDetails] = useState(null);
@@ -22,14 +23,15 @@ function Navbar({ user , setUser }) {
 
   return (
     <nav style={styles.navbar}>
-      <div style={styles.brand}>🛒 SmartRetail Insights</div>
+      <Link to="/" style={{ ...styles.brand, textDecoration: 'none', color: 'inherit' }}>
+        🛒 SmartRetail Insights
+      </Link>
       <div style={styles.links}>
-        <Link to="/" style={styles.link}>Home</Link>
         <Link to="/dashboard" style={styles.link}>Forecast</Link>
         <Link to="/detailed-inventory" style={styles.link}>Inventory</Link>
         {user ? (
           <span style={{ ...styles.link, cursor: 'pointer' }} onClick={fetchUserDetails}>
-            👤
+            <FaUserCircle size={24} />
           </span>
         ) : (
           <Link to="/auth" style={styles.link}>Login</Link>
