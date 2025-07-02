@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
-function Navbar({ user }) {
+function Navbar({ user , setUser }) {
   const [userDetails, setUserDetails] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const navigate = useNavigate();
 
   const fetchUserDetails = async () => {
     const res = await axios.get('http://localhost:5000/api/user-details', { withCredentials: true });
     setUserDetails(res.data);
     setShowPopup(true);
+  };
+
+  const handleLogout = async () => {
+    await axios.post('http://localhost:5000/api/logout', {}, { withCredentials: true });
+    setUser(null);  
+    setShowPopup(false);
+    navigate('/');  
   };
 
   return (
@@ -35,6 +43,7 @@ function Navbar({ user }) {
           <p><strong>Email:</strong> {userDetails.email}</p>
           <p><strong>Role:</strong> {userDetails.role}</p>
           <button onClick={() => setShowPopup(false)}>Close</button>
+          <button onClick={handleLogout}>Logout</button>
         </div>
       )}
     </nav>

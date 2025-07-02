@@ -13,7 +13,7 @@ function App() {
 
   return (
     <Router>
-      <Navbar user={user} />
+      <Navbar user={user} setUser={setUser} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard setUser={setUser} />} />
