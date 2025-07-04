@@ -46,8 +46,7 @@ function Dashboard({ user, setUser }) {
     PromoInterval_Feb_May_Aug_Nov: 0,
     PromoInterval_Jan_Apr_Jul_Oct: 0,
     PromoInterval_Mar_Jun_Sept_Dec: 0,
-    PromoInterval_None: 1,
-    ForecastDate: '2022-01-01'
+    PromoInterval_None: 1
   });
 
   useEffect(() => {
@@ -130,7 +129,7 @@ function Dashboard({ user, setUser }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const { ForecastDate, ...rest } = inputData;
-
+    console.log('Sending payload:', rest);
     axios.post('http://localhost:5000/api/forecast', rest, { withCredentials: true })
       .then(res => setDynamicForecast(res.data))
       .catch(err => alert('Prediction failed: ' + (err.response?.data?.error || err.message)));

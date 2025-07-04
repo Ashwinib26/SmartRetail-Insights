@@ -27,29 +27,38 @@ EXPECTED_FEATURES = [
   "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None"
 ]
 
-MODEL_COLUMNS = [f'Column_{i}' for i in range(30)]
+MODEL_COLUMNS = [f'Column_{i}' for i in range(len(EXPECTED_FEATURES))]
+
+# def make_prediction(input_dict):
+#     try:
+#         # Only take keys in EXPECTED_FEATURES
+#         full_input = {}
+#         for f in EXPECTED_FEATURES:
+#             full_input[f] = input_dict.get(f, 0)
+
+#         ordered_values = [full_input[f] for f in EXPECTED_FEATURES]
+
+#         # Wrap exactly with model column names
+#         df = pd.DataFrame([ordered_values], columns=MODEL_COLUMNS)
+
+#         print("Passing columns to model:", df.columns.tolist())
+#         print("Row shape:", df.shape)
+
+#         prediction = model.predict(df)[0]
+#         return prediction
+
+#     except Exception as e:
+#         print("MODEL PREDICTION ERROR:", str(e))
+#         raise
+
+MODEL_COLUMNS = EXPECTED_FEATURES.copy()
 
 def make_prediction(input_dict):
-    try:
-        # Only take keys in EXPECTED_FEATURES
-        full_input = {}
-        for f in EXPECTED_FEATURES:
-            full_input[f] = input_dict.get(f, 0)
-
-        ordered_values = [full_input[f] for f in EXPECTED_FEATURES]
-
-        # Wrap exactly with model column names
-        df = pd.DataFrame([ordered_values], columns=MODEL_COLUMNS)
-
-        print("Passing columns to model:", df.columns.tolist())
-        print("Row shape:", df.shape)
-
-        prediction = model.predict(df)[0]
-        return prediction
-
-    except Exception as e:
-        print("MODEL PREDICTION ERROR:", str(e))
-        raise
+    full_input = {f: input_dict.get(f, 0) for f in EXPECTED_FEATURES}
+    ordered_values = [full_input[f] for f in EXPECTED_FEATURES]
+    df = pd.DataFrame([ordered_values], columns=MODEL_COLUMNS)
+    prediction = model.predict(df)[0]
+    return prediction
 
 @app.route('/api/register', methods=['POST'])
 def register():
