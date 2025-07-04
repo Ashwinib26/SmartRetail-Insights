@@ -14,31 +14,55 @@ function Dashboard({ user, setUser }) {
   const normalizedRole = role ? role.toLowerCase() : '';
 
   const [showInventory, setShowInventory] = useState(false);
+
   const [inputData, setInputData] = useState({
-    Store: 1, DayOfWeek: 4, Promo: 1, SchoolHoliday: 0,
-    StoreType_a: 1, StoreType_b: 0, StoreType_c: 0, StoreType_d: 0,
-    Assortment_a: 1, Assortment_b: 0, Assortment_c: 0,
-    Promo2: 1, Promo2SinceWeek: 13, Promo2SinceYear: 2015,
-    CompetitionDistance: 200.0, CompetitionOpenSinceMonth: 9, CompetitionOpenSinceYear: 2010,
-    PromoInterval_Feb_May_Aug_Nov: 0, PromoInterval_Jan_Apr_Jul_Oct: 1,
-    PromoInterval_Mar_Jun_Sept_Dec: 0, PromoInterval_None: 0,
-    Open: 1, Year: 2022, Month: 1, Day: 1, WeekOfYear: 1, IsWeekend: 0,
+    Store: 1,
+    DayOfWeek: 1,
+    Open: 1,
+    Promo: 1,
+    SchoolHoliday: 0,
+    CompetitionDistance: 500.0,
+    CompetitionOpenSinceMonth: 1,
+    CompetitionOpenSinceYear: 2010,
+    Promo2: 0,
+    Promo2SinceWeek: 0,
+    Promo2SinceYear: 0,
+    Year: 2022,
+    Month: 1,
+    Day: 1,
+    WeekOfYear: 1,
+    IsWeekend: 0,
+    StoreType_a: 1,
+    StoreType_b: 0,
+    StoreType_c: 0,
+    StoreType_d: 0,
+    Assortment_a: 1,
+    Assortment_b: 0,
+    Assortment_c: 0,
+    StateHoliday_0: 1,
+    StateHoliday_a: 0,
+    StateHoliday_b: 0,
+    StateHoliday_c: 0,
+    PromoInterval_Feb_May_Aug_Nov: 0,
+    PromoInterval_Jan_Apr_Jul_Oct: 0,
+    PromoInterval_Mar_Jun_Sept_Dec: 0,
+    PromoInterval_None: 1,
     ForecastDate: '2022-01-01'
   });
 
   useEffect(() => {
-  axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
-    .then(res => {
-      if (res.data.authenticated) {
-        setIsAuthenticated(true);
-        setRole(res.data.role);
-        setUser(res.data.name); 
-      } else {
-        setShowPopup(true);
-      }
-    })
-    .catch(() => setShowPopup(true));
-}, []);
+    axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
+      .then(res => {
+        if (res.data.authenticated) {
+          setIsAuthenticated(true);
+          setRole(res.data.role);
+          setUser(res.data.name);
+        } else {
+          setShowPopup(true);
+        }
+      })
+      .catch(() => setShowPopup(true));
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated && role) {
@@ -106,19 +130,8 @@ function Dashboard({ user, setUser }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const { ForecastDate, ...rest } = inputData;
-    const allowed = [
-      "Store", "DayOfWeek", "Open", "Promo", "SchoolHoliday",
-      "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d",
-      "Assortment_a", "Assortment_b", "Assortment_c",
-      "Promo2", "Promo2SinceWeek", "Promo2SinceYear",
-      "CompetitionDistance", "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear",
-      "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct",
-      "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None",
-      "Year", "Month", "Day", "WeekOfYear", "IsWeekend"
-    ];
-    const modelInput = Object.fromEntries(Object.entries(rest).filter(([k]) => allowed.includes(k)));
 
-    axios.post('http://localhost:5000/api/forecast', modelInput, { withCredentials: true })
+    axios.post('http://localhost:5000/api/forecast', rest, { withCredentials: true })
       .then(res => setDynamicForecast(res.data))
       .catch(err => alert('Prediction failed: ' + (err.response?.data?.error || err.message)));
   };
@@ -171,10 +184,10 @@ function Dashboard({ user, setUser }) {
           axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
             .then(res => {
               if (res.data.authenticated) {
-                setUser(res.data.name); // set the logged in name!
+                setUser(res.data.name);
               }
             });
-        }}/>
+        }} />
       )}
 
       {isAuthenticated && (

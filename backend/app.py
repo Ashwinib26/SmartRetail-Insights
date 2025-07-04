@@ -22,22 +22,25 @@ EXPECTED_FEATURES = [
   "Year", "Month", "Day", "WeekOfYear", "IsWeekend",
   "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d",
   "Assortment_a", "Assortment_b", "Assortment_c",
+  "StateHoliday_0", "StateHoliday_a", "StateHoliday_b", "StateHoliday_c",
   "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct",
   "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None"
 ]
 
+MODEL_COLUMNS = [f'Column_{i}' for i in range(30)]
+
 def make_prediction(input_dict):
     try:
-        df = pd.DataFrame([input_dict])
+        # Fill missing expected features with zero
+        full_input = {f: input_dict.get(f, 0) for f in EXPECTED_FEATURES}
 
-        # Ensure all expected features exist:
-        for col in EXPECTED_FEATURES:
-            if col not in df.columns:
-                df[col] = 0
+        # Preserve the order
+        ordered_values = [full_input[f] for f in EXPECTED_FEATURES]
 
-        df = df[EXPECTED_FEATURES]  # Exact order!
+        # Now re-wrap in DataFrame with correct model columns
+        df = pd.DataFrame([ordered_values], columns=MODEL_COLUMNS)
 
-        print("Input DF Columns:", df.columns.tolist())
+        print("Passing columns:", df.columns.tolist())
 
         prediction = model.predict(df)[0]
         return prediction
