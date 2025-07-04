@@ -31,16 +31,18 @@ MODEL_COLUMNS = [f'Column_{i}' for i in range(30)]
 
 def make_prediction(input_dict):
     try:
-        # Fill missing expected features with zero
-        full_input = {f: input_dict.get(f, 0) for f in EXPECTED_FEATURES}
+        # Only take keys in EXPECTED_FEATURES
+        full_input = {}
+        for f in EXPECTED_FEATURES:
+            full_input[f] = input_dict.get(f, 0)
 
-        # Preserve the order
         ordered_values = [full_input[f] for f in EXPECTED_FEATURES]
 
-        # Now re-wrap in DataFrame with correct model columns
+        # Wrap exactly with model column names
         df = pd.DataFrame([ordered_values], columns=MODEL_COLUMNS)
 
-        print("Passing columns:", df.columns.tolist())
+        print("Passing columns to model:", df.columns.tolist())
+        print("Row shape:", df.shape)
 
         prediction = model.predict(df)[0]
         return prediction
