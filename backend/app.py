@@ -12,24 +12,39 @@ CORS(app, supports_credentials=True)
 users_db = {}   # email -> password_hash
 roles_db = {}   # email -> role
 
-model = joblib.load('D:/projects/Final Project/SmartRetail Insights/backend/models/sales_forecast_model.pkl')
+model = joblib.load('D:/projects/Final Project/SmartRetail Insights/backend/sales_forecast_model.pkl')
+print("Loaded model:", type(model))
+
+EXPECTED_FEATURES = [
+  "Store", "DayOfWeek", "Open", "Promo", "SchoolHoliday",
+  "CompetitionDistance", "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear",
+  "Promo2", "Promo2SinceWeek", "Promo2SinceYear",
+  "Year", "Month", "Day", "WeekOfYear", "IsWeekend",
+  "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d",
+  "Assortment_a", "Assortment_b", "Assortment_c",
+  "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct",
+  "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None"
+]
 
 def make_prediction(input_dict):
     try:
         df = pd.DataFrame([input_dict])
-        expected_features = model.feature_names_in_
 
-        for col in expected_features:
+        # Ensure all expected features exist:
+        for col in EXPECTED_FEATURES:
             if col not in df.columns:
                 df[col] = 0
 
-        df = df[expected_features]
+        df = df[EXPECTED_FEATURES]  # Exact order!
+
+        print("Input DF Columns:", df.columns.tolist())
+
         prediction = model.predict(df)[0]
         return prediction
+
     except Exception as e:
         print("MODEL PREDICTION ERROR:", str(e))
         raise
-
 
 @app.route('/api/register', methods=['POST'])
 def register():

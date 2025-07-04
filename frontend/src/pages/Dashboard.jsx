@@ -16,7 +16,6 @@ function Dashboard({ user, setUser }) {
   const [showInventory, setShowInventory] = useState(false);
   const [inputData, setInputData] = useState({
     Store: 1, DayOfWeek: 4, Promo: 1, SchoolHoliday: 0,
-    StateHoliday_0: 1, StateHoliday_a: 0, StateHoliday_b: 0, StateHoliday_c: 0,
     StoreType_a: 1, StoreType_b: 0, StoreType_c: 0, StoreType_d: 0,
     Assortment_a: 1, Assortment_b: 0, Assortment_c: 0,
     Promo2: 1, Promo2SinceWeek: 13, Promo2SinceYear: 2015,
@@ -108,10 +107,13 @@ function Dashboard({ user, setUser }) {
     e.preventDefault();
     const { ForecastDate, ...rest } = inputData;
     const allowed = [
-      "Store", "DayOfWeek", "Open", "Promo", "SchoolHoliday", "StateHoliday_0", "StateHoliday_a", "StateHoliday_b", "StateHoliday_c",
-      "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d", "Assortment_a", "Assortment_b", "Assortment_c",
-      "Promo2", "Promo2SinceWeek", "Promo2SinceYear", "CompetitionDistance", "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear",
-      "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct", "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None",
+      "Store", "DayOfWeek", "Open", "Promo", "SchoolHoliday",
+      "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d",
+      "Assortment_a", "Assortment_b", "Assortment_c",
+      "Promo2", "Promo2SinceWeek", "Promo2SinceYear",
+      "CompetitionDistance", "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear",
+      "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct",
+      "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None",
       "Year", "Month", "Day", "WeekOfYear", "IsWeekend"
     ];
     const modelInput = Object.fromEntries(Object.entries(rest).filter(([k]) => allowed.includes(k)));
