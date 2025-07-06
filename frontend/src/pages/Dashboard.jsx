@@ -110,19 +110,42 @@ function Dashboard({ user, setUser }) {
   };
 
   const handleReset = () => {
-    const today = new Date();
-    setInputData(prev => ({
-      ...prev,
+  const today = new Date();
+  const weekOfYear = getWeekOfYear(today);
+  const isWeekend = today.getDay() === 0 || today.getDay() === 6 ? 1 : 0;
+    setInputData({
       Store: Math.floor(Math.random() * 10) + 1,
+      DayOfWeek: today.getDay() === 0 ? 7 : today.getDay(),  // Sunday=0 in JS, so convert to 7 for consistency if needed
+      Open: 1,
       Promo: Math.round(Math.random()),
       SchoolHoliday: Math.round(Math.random()),
-      ForecastDate: today.toISOString().split('T')[0],
+      CompetitionDistance: 500.0,
+      CompetitionOpenSinceMonth: 1,
+      CompetitionOpenSinceYear: 2010,
+      Promo2: 0,
+      Promo2SinceWeek: 0,
+      Promo2SinceYear: 0,
       Year: today.getFullYear(),
       Month: today.getMonth() + 1,
       Day: today.getDate(),
-      WeekOfYear: getWeekOfYear(today),
-      IsWeekend: today.getDay() === 0 || today.getDay() === 6 ? 1 : 0
-    }));
+      WeekOfYear: weekOfYear,
+      IsWeekend: isWeekend,
+      StoreType_a: 1,
+      StoreType_b: 0,
+      StoreType_c: 0,
+      StoreType_d: 0,
+      Assortment_a: 1,
+      Assortment_b: 0,
+      Assortment_c: 0,
+      StateHoliday_0: 1,
+      StateHoliday_a: 0,
+      StateHoliday_b: 0,
+      StateHoliday_c: 0,
+      PromoInterval_Feb_May_Aug_Nov: 0,
+      PromoInterval_Jan_Apr_Jul_Oct: 0,
+      PromoInterval_Mar_Jun_Sept_Dec: 0,
+      ForecastDate: today.toISOString().split('T')[0]
+    });
   };
 
   const handleSubmit = (e) => {
