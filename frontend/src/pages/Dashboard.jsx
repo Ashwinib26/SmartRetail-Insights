@@ -63,13 +63,12 @@ function Dashboard({ user, setUser }) {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated && role) {
-      if (normalizedRole === 'developer' || normalizedRole === 'admin') {
-        axios.get('http://localhost:5000/api/forecast', { withCredentials: true })
-          .then(res => setForecast(res.data));
-      }
-    }
-  }, [isAuthenticated, normalizedRole]);
+  if (isAuthenticated && normalizedRole === 'developer' || normalizedRole === 'admin') {
+    axios.get('http://localhost:5000/api/forecast', { withCredentials: true })
+      .then(res => setForecast(res.data));
+  }
+}, [isAuthenticated, normalizedRole]);
+
 
   const fetchInventory = () => {
     axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
@@ -196,16 +195,59 @@ function Dashboard({ user, setUser }) {
 
   return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fa", minHeight: "100vh" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        📈 SmartRetail Insights : Forecast and Inventory {user ? ` | 👤 ${user}` : ''}
-      </h1>
 
       {showPopup && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0, 0, 0, 0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            background: '#fff',
+            padding: '2rem',
+            borderRadius: '12px',
+            textAlign: 'center',
+            maxWidth: '400px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
+          }}>
+            <h2 style={{ marginBottom: '1rem', color: '#d63031' }}>🚫 Unauthorized</h2>
+            <p style={{ marginBottom: '2rem' }}>
+              You are not authorized to access this page.<br/>
+              Please login to continue as an authorized user.
+            </p>
+            <button
+              onClick={() => setShowPopup(false)}
+              style={{
+                background: '#0984e3',
+                color: '#fff',
+                padding: '10px 20px',
+                fontSize: '1rem',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!showPopup && !isAuthenticated && (
         <LoginRegister onSuccess={() => {
           axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
             .then(res => {
               if (res.data.authenticated) {
+                setIsAuthenticated(true);
+                setRole(res.data.role);
                 setUser(res.data.name);
+                setShowPopup(false); // 🔑 ensure modal never reopens!
+              } else {
+                setShowPopup(true); // still blocked
               }
             });
         }} />
@@ -215,10 +257,12 @@ function Dashboard({ user, setUser }) {
         <>
           {(['developer', 'admin'].includes(normalizedRole)) && (
             <>
+              <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+                📈 SmartRetail Insights : Forecast and Inventory {user ? ` | 👤 ${user}` : ''}
+              </h1>
               <div style={sectionStyle}>
                 <p>Configure the parameters to forecast upcoming sales.</p>
               </div>
-
               <div style={sectionStyle}>
                 <h2>Forecast Parameters</h2>
                 <form onSubmit={handleSubmit}>
