@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, navigate} from 'react';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
 
@@ -55,6 +55,9 @@ function Dashboard({ user, setUser }) {
           setIsAuthenticated(true);
           setRole(res.data.role);
           setUser(res.data.name);
+          if (!['Developer', 'Admin', 'Developer', 'admin'].includes(res.data.role)) {
+            navigate('/auth');
+          }
         } else {
           setShowPopup(true);
         }
@@ -214,10 +217,10 @@ function Dashboard({ user, setUser }) {
             maxWidth: '400px',
             boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
           }}>
-            <h2 style={{ marginBottom: '1rem', color: '#d63031' }}>🚫 Unauthorized</h2>
+            <h2 style={{ marginBottom: '1rem', color: '#d63031' }}>🚫 Access Unavailable</h2>
             <p style={{ marginBottom: '2rem' }}>
-              You are not authorized to access this page.<br/>
-              Please login to continue as an authorized user.
+              You are not an authorized user for this page.<br/>
+              Please login with authorized role to continue.
             </p>
             <button
               onClick={() => setShowPopup(false)}
@@ -245,9 +248,8 @@ function Dashboard({ user, setUser }) {
                 setIsAuthenticated(true);
                 setRole(res.data.role);
                 setUser(res.data.name);
-                setShowPopup(false); // 🔑 ensure modal never reopens!
               } else {
-                setShowPopup(true); // still blocked
+                setShowPopup(true); 
               }
             });
         }} />
