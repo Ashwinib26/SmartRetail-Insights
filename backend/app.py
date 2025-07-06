@@ -29,28 +29,6 @@ EXPECTED_FEATURES = [
 
 MODEL_COLUMNS = [f'Column_{i}' for i in range(len(EXPECTED_FEATURES))]
 
-# def make_prediction(input_dict):
-#     try:
-#         # Only take keys in EXPECTED_FEATURES
-#         full_input = {}
-#         for f in EXPECTED_FEATURES:
-#             full_input[f] = input_dict.get(f, 0)
-
-#         ordered_values = [full_input[f] for f in EXPECTED_FEATURES]
-
-#         # Wrap exactly with model column names
-#         df = pd.DataFrame([ordered_values], columns=MODEL_COLUMNS)
-
-#         print("Passing columns to model:", df.columns.tolist())
-#         print("Row shape:", df.shape)
-
-#         prediction = model.predict(df)[0]
-#         return prediction
-
-#     except Exception as e:
-#         print("MODEL PREDICTION ERROR:", str(e))
-#         raise
-
 MODEL_COLUMNS = EXPECTED_FEATURES.copy()
 print("Expected features:", len(EXPECTED_FEATURES))
 
@@ -179,8 +157,6 @@ def forecast():
 
         prediction = make_prediction(static_data)
         return jsonify({
-            'category': 'Grocery',
-            'region': 'North',
             'next_7_days_sales': [123, 123, 123, 123, 123, 123, 123]
         })
     except Exception as e:
@@ -195,8 +171,6 @@ def forecast_dynamic():
     try:
         prediction = make_prediction(data)
         return jsonify({
-            'category': 'Electronics',
-            'region': 'North',
             'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]
         })
     except Exception as e:

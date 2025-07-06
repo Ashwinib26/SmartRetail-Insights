@@ -248,11 +248,60 @@ function Dashboard({ user, setUser }) {
               </div>
 
               {dynamicForecast && (
-                <div style={sectionStyle}>
-                  <h3>📅 Forecast Result</h3>
-                  <p><strong>Category:</strong> {dynamicForecast.category}</p>
-                  <p><strong>Region:</strong> {dynamicForecast.region}</p>
-                  <p><strong>Next 7 Days Sales:</strong> {dynamicForecast.next_7_days_sales.join(', ')}</p>
+                <div style={{
+                  ...sectionStyle,
+                  background: "#ffffff",
+                  borderLeft: "6px solid #0984e3",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  padding: "2rem",
+                  borderRadius: "12px"
+                }}>
+                  <h3 style={{ 
+                    marginBottom: "1rem",
+                    fontSize: "1.5rem",
+                    color: "#0984e3"
+                  }}>
+                    📅 Forecast Result
+                  </h3>
+
+                  <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "1rem",
+                    fontSize: "1.1rem",
+                    lineHeight: "1.6"
+                  }}>
+                    <div style={{ 
+                      display: "flex",
+                      flexDirection: "column",
+                      background: "#f1f2f6",
+                      padding: "1rem",
+                      borderRadius: "8px"
+                    }}>
+                      <strong style={{ marginBottom: "0.5rem" }}>Next 7 Days Sales</strong>
+                      <ul style={{
+                        listStyle: "none",
+                        padding: 0,
+                        margin: 0,
+                        display: "flex",
+                        gap: "1rem",
+                        flexWrap: "wrap"
+                      }}>
+                        {dynamicForecast.next_7_days_sales.map((sale, index) => (
+                          <li key={index} style={{
+                            background: "#dfe6e9",
+                            padding: "0.5rem 1rem",
+                            borderRadius: "6px",
+                            minWidth: "60px",
+                            textAlign: "center",
+                            fontWeight: "500"
+                          }}>
+                            {sale}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               )}
 
