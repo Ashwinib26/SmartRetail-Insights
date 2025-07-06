@@ -63,11 +63,11 @@ function Dashboard({ user, setUser }) {
   }, []);
 
   useEffect(() => {
-  if (isAuthenticated && normalizedRole === 'developer' || normalizedRole === 'admin') {
-    axios.get('http://localhost:5000/api/forecast', { withCredentials: true })
-      .then(res => setForecast(res.data));
-  }
-}, [isAuthenticated, normalizedRole]);
+    if (isAuthenticated && (normalizedRole === 'developer' || normalizedRole === 'admin')) {
+      axios.get('http://localhost:5000/api/forecast', { withCredentials: true })
+        .then(res => setForecast(res.data));
+    }
+  }, [isAuthenticated, normalizedRole]);
 
 
   const fetchInventory = () => {

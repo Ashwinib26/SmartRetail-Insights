@@ -78,7 +78,6 @@ def register():
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
-    print('Login data received:', data)
     email = data.get('email')
     password = data.get('password')
     role = data.get('role')
@@ -88,15 +87,14 @@ def login():
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
             user = cursor.fetchone()
-        print('User fetched:', user)
 
         if not user:
             return jsonify({'error': 'Invalid credentials'}), 401
 
-        stored_password = user['password']
+        stored_password_hash = user['password_hash']
         stored_role = user['role']
 
-        if stored_password != password:
+        if not check_password_hash(stored_password_hash, password):
             return jsonify({'error': 'Invalid credentials'}), 401
 
         if role.lower() != stored_role.lower():
@@ -107,7 +105,7 @@ def login():
         return jsonify({
             'message': 'Logged in successfully',
             'role': stored_role,
-            'name': user['name'] 
+            'name': user['name']
         }), 200
 
     finally:
@@ -143,6 +141,8 @@ def check_auth():
 def forecast():
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
+    if session.get('role').lower() not in ['developer', 'admin']:
+        return jsonify({'error': 'Forbidden'}), 403
     try:
         static_data = {
             'Store': 1, 'DayOfWeek': 4, 'Open': 1, 'Promo': 1, 'SchoolHoliday': 0,
@@ -167,6 +167,8 @@ def forecast():
 def forecast_dynamic():
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
+    if session.get('role').lower() not in ['developer', 'admin']:
+        return jsonify({'error': 'Forbidden'}), 403
     data = request.json
     try:
         prediction = make_prediction(data)
@@ -204,6 +206,8 @@ def user_details():
 def inventory():
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
+    if session.get('role').lower() not in ['developer', 'admin']:
+        return jsonify({'error': 'Forbidden'}), 403
 
     try:
         connection = get_db_connection()
