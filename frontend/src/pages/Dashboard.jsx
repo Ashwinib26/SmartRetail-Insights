@@ -45,8 +45,7 @@ function Dashboard({ user, setUser }) {
     StateHoliday_c: 0,
     PromoInterval_Feb_May_Aug_Nov: 0,
     PromoInterval_Jan_Apr_Jul_Oct: 0,
-    PromoInterval_Mar_Jun_Sept_Dec: 0,
-    PromoInterval_None: 1
+    PromoInterval_Mar_Jun_Sept_Dec: 0
   });
 
   useEffect(() => {

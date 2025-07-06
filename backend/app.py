@@ -24,7 +24,7 @@ EXPECTED_FEATURES = [
   "Assortment_a", "Assortment_b", "Assortment_c",
   "StateHoliday_0", "StateHoliday_a", "StateHoliday_b", "StateHoliday_c",
   "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct",
-  "PromoInterval_Mar_Jun_Sept_Dec", "PromoInterval_None"
+  "PromoInterval_Mar_Jun_Sept_Dec"
 ]
 
 MODEL_COLUMNS = [f'Column_{i}' for i in range(len(EXPECTED_FEATURES))]
@@ -52,6 +52,7 @@ MODEL_COLUMNS = [f'Column_{i}' for i in range(len(EXPECTED_FEATURES))]
 #         raise
 
 MODEL_COLUMNS = EXPECTED_FEATURES.copy()
+print("Expected features:", len(EXPECTED_FEATURES))
 
 def make_prediction(input_dict):
     full_input = {f: input_dict.get(f, 0) for f in EXPECTED_FEATURES}
