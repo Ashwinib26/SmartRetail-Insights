@@ -1,13 +1,14 @@
-import React, { useEffect, useState, navigate} from 'react';
+import React, { useEffect, useState} from 'react';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
+import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState(null);
   const [user, setUser] = useState('');
   const [showPopup, setShowPopup] = useState(false);
-
+  const navigate=useNavigate();
   const [forecast, setForecast] = useState(null);
   const [inventory, setInventory] = useState([]);
   const [dynamicForecast, setDynamicForecast] = useState(null);
@@ -169,7 +170,7 @@ function Dashboard() {
       .catch(err => alert('Prediction failed: ' + (err.response?.data?.error || err.message)));
   };
 
-  const handleContinue = () => {
+   const handleContinue = () => {
     navigate('/auth');
   };
 
