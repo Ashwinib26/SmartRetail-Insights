@@ -2,9 +2,10 @@ import React, { useEffect, useState, navigate} from 'react';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
 
-function Dashboard({ user, setUser }) {
+function Dashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState(null);
+  const [user, setUser] = useState('');
   const [showPopup, setShowPopup] = useState(false);
 
   const [forecast, setForecast] = useState(null);

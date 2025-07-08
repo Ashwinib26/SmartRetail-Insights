@@ -7,6 +7,7 @@ function Inventory() {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState(null);
+  const [user, setUser] = useState('');
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
@@ -15,6 +16,7 @@ function Inventory() {
         if (res.data.authenticated) {
           setIsAuthenticated(true);
           setRole(res.data.role);
+          setUser(res.data.name)
 
           if (!['analyst', 'admin'].includes(res.data.role.toLowerCase())) {
             // User is logged in but role not allowed => show popup
@@ -80,7 +82,7 @@ function Inventory() {
       )}
 
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        📈 SmartRetail Insights : Inventory Dashboard
+        📈 SmartRetail Insights : Inventory Dashboard {user ? ` | 👤 ${user}` : ''}
       </h1>
 
       {isAuthenticated && !showPopup && (
