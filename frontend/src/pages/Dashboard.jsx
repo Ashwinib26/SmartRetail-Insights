@@ -2,7 +2,7 @@ import React, { useEffect, useState} from 'react';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
 import { useNavigate } from 'react-router-dom';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 function Dashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -394,13 +394,13 @@ function Dashboard() {
                 <div style={{ marginTop: '2rem' }}>
                 <h3>📈 7 Days Sales Forecast Chart</h3>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={chartData}>
+                  <BarChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="day" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="sales" stroke="#0984e3" strokeWidth={2} />
-                  </LineChart>
+                    <Bar dataKey="sales" fill="#0984e3" />
+                  </BarChart>
                 </ResponsiveContainer>
               </div>
               </div>
