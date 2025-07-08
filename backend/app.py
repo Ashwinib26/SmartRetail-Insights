@@ -44,7 +44,7 @@ def register():
     data = request.json
     name = data.get('name')
     email = data.get('email')
-    password = data.get('password')
+    password = data.get('password')  # 👉 plain text
     role = data.get('role', 'Analyst')
 
     if not email or not password or not role or not name:
@@ -53,27 +53,27 @@ def register():
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
+            # Check if user already exists
             cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
             existing_user = cursor.fetchone()
             if existing_user:
                 return jsonify({'error': 'User already exists'}), 400
 
-            hashed = generate_password_hash(password)
+            # 👇 INSERT plain password directly
             cursor.execute(
-                "INSERT INTO users (name, email, password_hash, role) VALUES (%s, %s, %s, %s)",
-                (name, email, hashed, role)
+                "INSERT INTO users (name, email, password, role) VALUES (%s, %s, %s, %s)",
+                (name, email, password, role)
             )
             connection.commit()
         connection.close()
 
         session['user'] = email
         session['role'] = role
-        return jsonify({'message': 'Registered successfully', 'role': role}), 200
+        return jsonify({'message': 'Registered successfully', 'role': role, 'name': name}), 200
 
     except Exception as e:
         print("REGISTER ERROR:", str(e))
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/api/login', methods=['POST'])
 def login():
