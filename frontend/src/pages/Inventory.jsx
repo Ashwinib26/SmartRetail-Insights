@@ -19,11 +19,9 @@ function Inventory() {
           setUser(res.data.name)
 
           if (!['analyst', 'admin'].includes(res.data.role.toLowerCase())) {
-            // User is logged in but role not allowed => show popup
             setShowPopup(true);
           }
         } else {
-          // Not logged in at all => show popup
           setShowPopup(true);
         }
       })
@@ -33,8 +31,11 @@ function Inventory() {
       });
   }, [navigate]);
 
-  const handleClosePopup = () => {
-    // Optional: log out or navigate away
+  const handleContinue = () => {
+    navigate('/auth');
+  };
+
+  const handleGoBack = () => {
     navigate('/');
   };
 
@@ -64,7 +65,21 @@ function Inventory() {
               Please login with an authorized role to continue.
             </p>
             <button
-              onClick={handleClosePopup}
+              onClick={handleGoBack}
+              style={{
+                background: '#0984e3',
+                color: '#fff',
+                padding: '10px 20px',
+                fontSize: '1rem',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              Go Back
+            </button>
+            <button
+              onClick={handleContinue}
               style={{
                 background: '#0984e3',
                 color: '#fff',
@@ -94,7 +109,6 @@ function Inventory() {
         />
       )}
 
-      {/* Optional: login/register fallback if completely unauthenticated */}
       {!isAuthenticated && !showPopup && (
         <LoginRegister
           onSuccess={() => {

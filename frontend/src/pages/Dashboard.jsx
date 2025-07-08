@@ -169,6 +169,14 @@ function Dashboard() {
       .catch(err => alert('Prediction failed: ' + (err.response?.data?.error || err.message)));
   };
 
+  const handleContinue = () => {
+    navigate('/auth');
+  };
+
+  const handleGoBack = () => {
+    navigate('/');
+  };
+
   const sectionStyle = {
     background: "#ffffff",
     padding: "1.5rem 2rem",
@@ -232,7 +240,21 @@ function Dashboard() {
               Please login with authorized role to continue.
             </p>
             <button
-              onClick={handleClosePopup}
+              onClick={handleGoBack}
+              style={{
+                background: '#0984e3',
+                color: '#fff',
+                padding: '10px 20px',
+                fontSize: '1rem',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              Go Back
+            </button>
+            <button
+              onClick={handleContinue}
               style={{
                 background: '#0984e3',
                 color: '#fff',
