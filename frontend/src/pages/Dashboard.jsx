@@ -2,6 +2,7 @@ import React, { useEffect, useState} from 'react';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
 import { useNavigate } from 'react-router-dom';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 function Dashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,6 +17,11 @@ function Dashboard() {
   const normalizedRole = role ? role.toLowerCase() : '';
 
   const [showInventory, setShowInventory] = useState(false);
+
+  const chartData = dynamicForecast?.next_7_days_sales?.map((sale, index) => ({
+    day: `Day ${index + 1}`,
+    sales: sale
+  })) || [];
 
   const [inputData, setInputData] = useState({
     Store: 1,
@@ -128,7 +134,7 @@ function Dashboard() {
   const isWeekend = today.getDay() === 0 || today.getDay() === 6 ? 1 : 0;
     setInputData({
       Store: Math.floor(Math.random() * 10) + 1,
-      DayOfWeek: today.getDay() === 0 ? 7 : today.getDay(),  // Sunday=0 in JS, so convert to 7 for consistency if needed
+      DayOfWeek: today.getDay() === 0 ? 7 : today.getDay(),  
       Open: 1,
       Promo: Math.round(Math.random()),
       SchoolHoliday: Math.round(Math.random()),
@@ -385,6 +391,18 @@ function Dashboard() {
                     ))}
                   </ul>
                 </div>
+                <div style={{ marginTop: '2rem' }}>
+                <h3>📈 7 Days Sales Forecast Chart</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="sales" stroke="#0984e3" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
               </div>
             </div>
           )}
