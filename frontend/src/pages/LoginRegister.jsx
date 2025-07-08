@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function LoginRegister({ onSuccess , setUser }) {
+function LoginRegister({ onSuccess, setUser }) {
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -11,7 +11,7 @@ function LoginRegister({ onSuccess , setUser }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const navigate = useNavigate(); // ADD THIS
+  const navigate = useNavigate();
 
   const normalizeRole = (r) => r.toLowerCase();
 
@@ -48,8 +48,7 @@ function LoginRegister({ onSuccess , setUser }) {
     <div
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
+        top: 0, left: 0,
         width: '100%',
         height: '100%',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -61,31 +60,50 @@ function LoginRegister({ onSuccess , setUser }) {
     >
       <div
         style={{
-          backgroundColor: 'white',
+          backgroundColor: '#ffffff',
           padding: '2rem',
-          borderRadius: '8px',
-          width: '300px',
-          textAlign: 'center'
+          borderRadius: '16px',
+          width: '100%',
+          maxWidth: '400px',
+          textAlign: 'center',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+          fontFamily: 'Arial, sans-serif'
         }}
       >
-        <h2>{isLogin ? 'Login' : 'Register'}</h2>
+        <h2 style={{ marginBottom: '1.5rem', color: '#1e272e' }}>
+          {isLogin ? '🔐 Login' : '📝 Register'}
+        </h2>
 
         {!isLogin && (
           <input
             type="text"
-            placeholder="Name"
+            placeholder="Full Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{ width: '100%', marginBottom: '10px' }}
+            style={{
+              width: '100%',
+              padding: '12px',
+              marginBottom: '12px',
+              borderRadius: '8px',
+              border: '1px solid #ccc',
+              outline: 'none'
+            }}
           />
         )}
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Email Address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', marginBottom: '10px' }}
+          style={{
+            width: '100%',
+            padding: '12px',
+            marginBottom: '12px',
+            borderRadius: '8px',
+            border: '1px solid #ccc',
+            outline: 'none'
+          }}
         />
 
         <input
@@ -93,27 +111,60 @@ function LoginRegister({ onSuccess , setUser }) {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%', marginBottom: '10px' }}
+          style={{
+            width: '100%',
+            padding: '12px',
+            marginBottom: '12px',
+            borderRadius: '8px',
+            border: '1px solid #ccc',
+            outline: 'none'
+          }}
         />
 
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          style={{ width: '100%', marginBottom: '10px' }}
+          style={{
+            width: '100%',
+            padding: '12px',
+            marginBottom: '20px',
+            borderRadius: '8px',
+            border: '1px solid #ccc',
+            outline: 'none',
+            backgroundColor: '#f9f9f9'
+          }}
         >
           <option value="Analyst">Analyst</option>
           <option value="Developer">Developer</option>
           <option value="Admin">Admin</option>
         </select>
 
-        <button onClick={handleSubmit} style={{ width: '100%' }}>
-          {isLogin ? 'Login' : 'Register'}
+        <button
+          onClick={handleSubmit}
+          style={{
+            width: '100%',
+            padding: '12px',
+            backgroundColor: '#1e272e',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '1rem'
+          }}
+        >
+          {isLogin ? 'Proceed' : 'Proceed'}
         </button>
 
-        {success && <p style={{ color: 'green', marginTop: '10px' }}>✅ {success}</p>}
-        {error && <p style={{ color: 'red', marginTop: '10px' }}>⚠️ {error}</p>}
+        {success && (
+          <p style={{ color: '#00b894', marginTop: '15px' }}>✅ {success}</p>
+        )}
 
-        <p style={{ marginTop: '10px' }}>
+        {error && (
+          <p style={{ color: '#d63031', marginTop: '15px' }}>⚠️ {error}</p>
+        )}
+
+        <p style={{ marginTop: '15px', fontSize: '0.9rem' }}>
           {isLogin ? "Don't have an account?" : 'Already have an account?'}
           <button
             onClick={() => {
@@ -121,7 +172,15 @@ function LoginRegister({ onSuccess , setUser }) {
               setError('');
               setSuccess('');
             }}
-            style={{ marginLeft: '5px' }}
+            style={{
+              marginLeft: '6px',
+              background: 'none',
+              border: 'none',
+              color: '#0984e3',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              fontWeight: 'bold'
+            }}
           >
             {isLogin ? 'Register' : 'Login'}
           </button>
