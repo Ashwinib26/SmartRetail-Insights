@@ -85,16 +85,19 @@ def login():
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+            cursor.execute("SELECT name, password, role FROM users WHERE email = %s", (email,))
             user = cursor.fetchone()
 
         if not user:
             return jsonify({'error': 'Invalid credentials'}), 401
 
-        stored_password_hash = user['password_hash']
+        if not isinstance(user, dict):
+            user = dict(user)
+
+        stored_password = user['password']
         stored_role = user['role']
 
-        if not check_password_hash(stored_password_hash, password):
+        if stored_password != password:
             return jsonify({'error': 'Invalid credentials'}), 401
 
         if role.lower() != stored_role.lower():
@@ -110,7 +113,6 @@ def login():
 
     finally:
         connection.close()
-
 
 @app.route('/api/logout', methods=['POST'])
 def logout():

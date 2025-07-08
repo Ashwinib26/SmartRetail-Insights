@@ -55,14 +55,19 @@ function Dashboard({ user, setUser }) {
           setIsAuthenticated(true);
           setRole(res.data.role);
           setUser(res.data.name);
-          if (!['Developer', 'Admin', 'Developer', 'admin'].includes(res.data.role)) {
-            navigate('/auth');
+
+          // ✅ Only show popup if role is not allowed
+          if (!['developer', 'admin'].includes(res.data.role.toLowerCase())) {
+            setShowPopup(true);
           }
         } else {
-          setShowPopup(true);
+          setShowPopup(true); // Not logged in
         }
       })
-      .catch(() => setShowPopup(true));
+      .catch(err => {
+        console.error('Auth check failed:', err);
+        setShowPopup(true);
+      });
   }, []);
 
   useEffect(() => {
@@ -76,6 +81,10 @@ function Dashboard({ user, setUser }) {
   const fetchInventory = () => {
     axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
       .then(res => setInventory(res.data));
+  };
+
+  const handleClosePopup = () => {
+    navigate('/'); 
   };
 
   const handleToggleInventory = () => {
@@ -196,9 +205,8 @@ function Dashboard({ user, setUser }) {
     borderBottom: '1px solid #eee'
   };
 
-  return (
+   return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fa", minHeight: "100vh" }}>
-
       {showPopup && (
         <div style={{
           position: 'fixed',
@@ -223,7 +231,7 @@ function Dashboard({ user, setUser }) {
               Please login with authorized role to continue.
             </p>
             <button
-              onClick={() => setShowPopup(false)}
+              onClick={handleClosePopup}
               style={{
                 background: '#0984e3',
                 color: '#fff',
@@ -240,147 +248,151 @@ function Dashboard({ user, setUser }) {
         </div>
       )}
 
-      {!showPopup && !isAuthenticated && (
-        <LoginRegister onSuccess={() => {
-          axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
-            .then(res => {
-              if (res.data.authenticated) {
-                setIsAuthenticated(true);
-                setRole(res.data.role);
-                setUser(res.data.name);
-              } else {
-                setShowPopup(true); 
-              }
-            });
-        }} />
+      {!isAuthenticated && !showPopup && (
+        <LoginRegister
+          onSuccess={() => {
+            axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
+              .then(res => {
+                if (res.data.authenticated) {
+                  setIsAuthenticated(true);
+                  setRole(res.data.role);
+                  setUser(res.data.name);
+
+                  if (!['developer', 'admin'].includes(res.data.role.toLowerCase())) {
+                    setShowPopup(true);
+                  }
+                } else {
+                  setShowPopup(true);
+                }
+              });
+          }}
+        />
       )}
 
-      {isAuthenticated && (
+      {isAuthenticated && !showPopup && (
         <>
-          {(['developer', 'admin'].includes(normalizedRole)) && (
-            <>
-              <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-                📈 SmartRetail Insights : Forecast and Inventory {user ? ` | 👤 ${user}` : ''}
-              </h1>
-              <div style={sectionStyle}>
-                <p>Configure the parameters to forecast upcoming sales.</p>
-              </div>
-              <div style={sectionStyle}>
-                <h2>Forecast Parameters</h2>
-                <form onSubmit={handleSubmit}>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-                    {Object.keys(inputData).map((key, i) => (
-                      <div key={i}>
-                        <label style={{ fontWeight: "500" }}>{key}</label>
-                        <input
-                          type={key === "ForecastDate" ? "date" : "number"}
-                          name={key}
-                          value={inputData[key]}
-                          onChange={handleChange}
-                          style={inputStyle}
-                        />
-                      </div>
-                    ))}
-                  </div>
+          <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+            📈 SmartRetail Insights : Forecast and Inventory {user ? ` | 👤 ${user}` : ''}
+          </h1>
 
-                  <div style={{ marginTop: "1.5rem" }}>
-                    <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
-                    <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
-                    <button onClick={handleToggleInventory} style={buttonStyle}>
-                      📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
-                    </button>
+          <div style={sectionStyle}>
+            <p>Configure the parameters to forecast upcoming sales.</p>
+          </div>
+
+          <div style={sectionStyle}>
+            <h2>Forecast Parameters</h2>
+            <form onSubmit={handleSubmit}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+                {Object.keys(inputData).map((key, i) => (
+                  <div key={i}>
+                    <label style={{ fontWeight: "500" }}>{key}</label>
+                    <input
+                      type={key === "ForecastDate" ? "date" : "number"}
+                      name={key}
+                      value={inputData[key]}
+                      onChange={handleChange}
+                      style={inputStyle}
+                    />
                   </div>
-                </form>
+                ))}
               </div>
 
-              {dynamicForecast && (
+              <div style={{ marginTop: "1.5rem" }}>
+                <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
+                <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
+                <button type="button" onClick={handleToggleInventory} style={buttonStyle}>
+                  📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {dynamicForecast && (
+            <div style={{
+              ...sectionStyle,
+              background: "#ffffff",
+              borderLeft: "6px solid #0984e3",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              padding: "2rem",
+              borderRadius: "12px"
+            }}>
+              <h3 style={{
+                marginBottom: "1rem",
+                fontSize: "1.5rem",
+                color: "#0984e3"
+              }}>
+                📅 Forecast Result
+              </h3>
+
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                fontSize: "1.1rem",
+                lineHeight: "1.6"
+              }}>
                 <div style={{
-                  ...sectionStyle,
-                  background: "#ffffff",
-                  borderLeft: "6px solid #0984e3",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  padding: "2rem",
-                  borderRadius: "12px"
+                  display: "flex",
+                  flexDirection: "column",
+                  background: "#f1f2f6",
+                  padding: "1rem",
+                  borderRadius: "8px"
                 }}>
-                  <h3 style={{ 
-                    marginBottom: "1rem",
-                    fontSize: "1.5rem",
-                    color: "#0984e3"
-                  }}>
-                    📅 Forecast Result
-                  </h3>
-
-                  <div style={{
+                  <strong style={{ marginBottom: "0.5rem" }}>Next 7 Days Sales</strong>
+                  <ul style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: 0,
                     display: "flex",
-                    flexDirection: "column",
                     gap: "1rem",
-                    fontSize: "1.1rem",
-                    lineHeight: "1.6"
+                    flexWrap: "wrap"
                   }}>
-                    <div style={{ 
-                      display: "flex",
-                      flexDirection: "column",
-                      background: "#f1f2f6",
-                      padding: "1rem",
-                      borderRadius: "8px"
-                    }}>
-                      <strong style={{ marginBottom: "0.5rem" }}>Next 7 Days Sales</strong>
-                      <ul style={{
-                        listStyle: "none",
-                        padding: 0,
-                        margin: 0,
-                        display: "flex",
-                        gap: "1rem",
-                        flexWrap: "wrap"
+                    {dynamicForecast.next_7_days_sales.map((sale, index) => (
+                      <li key={index} style={{
+                        background: "#dfe6e9",
+                        padding: "0.5rem 1rem",
+                        borderRadius: "6px",
+                        minWidth: "60px",
+                        textAlign: "center",
+                        fontWeight: "500"
                       }}>
-                        {dynamicForecast.next_7_days_sales.map((sale, index) => (
-                          <li key={index} style={{
-                            background: "#dfe6e9",
-                            padding: "0.5rem 1rem",
-                            borderRadius: "6px",
-                            minWidth: "60px",
-                            textAlign: "center",
-                            fontWeight: "500"
-                          }}>
-                            {sale}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                        {sale}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              )}
+              </div>
+            </div>
+          )}
 
-              {showInventory && (
-                <div style={sectionStyle}>
-                  <h3>📦 Current Inventory Overview</h3>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-                    <thead style={{ backgroundColor: '#dfe6e9' }}>
-                      <tr>
-                        <th style={tableHeader}>Item</th>
-                        <th style={tableHeader}>Category</th>
-                        <th style={tableHeader}>Demand</th>
-                        <th style={tableHeader}>Stock</th>
-                        <th style={tableHeader}>Alert</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {inventory.map((item, idx) => (
-                        <tr key={idx} style={{ textAlign: 'center' }}>
-                          <td style={tableCell}>{item.item}</td>
-                          <td style={tableCell}>{item.category}</td>
-                          <td style={tableCell}>{item.demand}</td>
-                          <td style={tableCell}>{item.stock}</td>
-                          <td style={tableCell}>
-                            {item.alert ? <span style={{ color: '#d63031' }}>⚠️ Low</span> : <span style={{ color: '#00b894' }}>✅ OK</span>}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
+          {showInventory && (
+            <div style={sectionStyle}>
+              <h3>📦 Current Inventory Overview</h3>
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                <thead style={{ backgroundColor: '#dfe6e9' }}>
+                  <tr>
+                    <th style={tableHeader}>Item</th>
+                    <th style={tableHeader}>Category</th>
+                    <th style={tableHeader}>Demand</th>
+                    <th style={tableHeader}>Stock</th>
+                    <th style={tableHeader}>Alert</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inventory.map((item, idx) => (
+                    <tr key={idx} style={{ textAlign: 'center' }}>
+                      <td style={tableCell}>{item.item}</td>
+                      <td style={tableCell}>{item.category}</td>
+                      <td style={tableCell}>{item.demand}</td>
+                      <td style={tableCell}>{item.stock}</td>
+                      <td style={tableCell}>
+                        {item.alert ? <span style={{ color: '#d63031' }}>⚠️ Low</span> : <span style={{ color: '#00b894' }}>✅ OK</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </>
       )}
