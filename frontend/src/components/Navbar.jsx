@@ -27,8 +27,9 @@ function Navbar({ user , setUser }) {
         🛒 SmartRetail Insights
       </Link>
       <div style={styles.links}>
-        <Link to="/dashboard" style={styles.link}>Forecast</Link>
+        <Link to="/forecast" style={styles.link}>Forecast</Link>
         <Link to="/detailed-inventory" style={styles.link}>Inventory</Link>
+        <Link to="/dashboard" style={styles.link}>Dashboard</Link>
         {user ? (
           <span style={{ ...styles.link, cursor: 'pointer' }} onClick={fetchUserDetails}>
             <FaUserCircle size={24} />
