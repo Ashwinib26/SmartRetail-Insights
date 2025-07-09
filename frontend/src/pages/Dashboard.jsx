@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import LoginRegister from './LoginRegister';
 
-function Inventory() {
+function Dashboard() {
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState(null);
@@ -100,14 +100,14 @@ function Inventory() {
         📈 SmartRetail Insights : Analysis Dashboard {user ? ` | 👤 ${user}` : ''}
       </h1>
 
-      {/* {isAuthenticated && !showPopup && (
+      {isAuthenticated && !showPopup && (
         <iframe
           src="http://localhost:8501"
           title="Inventory"
           width="100%"
           height="800px"
         />
-      )} */}
+      )}
 
       {!isAuthenticated && !showPopup && (
         <LoginRegister
@@ -127,4 +127,4 @@ function Inventory() {
   );
 }
 
-export default Inventory;
+export default Dashboard;

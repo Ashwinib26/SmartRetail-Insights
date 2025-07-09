@@ -4,7 +4,7 @@ import LoginRegister from './LoginRegister';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-function Dashboard() {
+function Forecast() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState(null);
   const [user, setUser] = useState('');
@@ -442,4 +442,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Forecast;

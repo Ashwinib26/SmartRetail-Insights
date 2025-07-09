@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Footer from './components/Footer';
 import Auth from './pages/LoginRegister';
 import DetailedInventory from './pages/Inventory';
+import Forecast from './pages/Forecast';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -16,6 +17,7 @@ function App() {
       <Navbar user={user} setUser={setUser} />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/forecast" element={<Forecast setUser={setUser} />} />
         <Route path="/dashboard" element={<Dashboard setUser={setUser} />} />
         <Route path="/auth" element={<Auth setUser={setUser} />} />
         <Route path="/detailed-inventory" element={<DetailedInventory />} />
