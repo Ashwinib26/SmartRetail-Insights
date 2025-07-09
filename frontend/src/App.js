@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
@@ -8,9 +8,22 @@ import Footer from './components/Footer';
 import Auth from './pages/LoginRegister';
 import DetailedInventory from './pages/Inventory';
 import Forecast from './pages/Forecast';
+import axios from 'axios';
 
 function App() {
   const [user, setUser] = useState(null);
+  useEffect(() => {
+    // ✅ Check session on page load
+    axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
+      .then(res => {
+        if (res.data.authenticated) {
+          setUser(res.data.name); // make sure backend sends `name`
+        }
+      })
+      .catch(err => {
+        console.log('Auth check failed', err);
+      });
+  }, []);
 
   return (
     <Router>
