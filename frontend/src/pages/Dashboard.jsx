@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import LoginRegister from './LoginRegister';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -9,6 +10,17 @@ function Dashboard() {
   const [role, setRole] = useState(null);
   const [user, setUser] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [inventory, setInventory] = useState([]);
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
+      .then(res => {
+        setInventory(res.data);
+      })
+      .catch(err => {
+        console.error('Failed to load inventory:', err);
+      });
+  }, []);
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
@@ -123,7 +135,18 @@ function Dashboard() {
           }}
         />
       )}
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart data={inventory}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="item" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="stock" fill="#00b894" />
+          <Bar dataKey="demand" fill="#d63031" />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
+
   );
 }
 

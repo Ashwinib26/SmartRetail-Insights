@@ -203,6 +203,19 @@ def user_details():
         return jsonify(user)
     finally:
         connection.close()
+        
+@app.route('/api/inventory', methods=['GET'])
+def get_inventory():
+    connection = get_db_connection()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT item, category, stock, demand FROM inventory")
+            rows = cursor.fetchall()
+            # convert rows to dicts if needed
+            data = [dict(row) for row in rows]
+        return jsonify(data), 200
+    finally:
+        connection.close()
 
 @app.route('/api/inventory', methods=['GET'])
 def inventory():
