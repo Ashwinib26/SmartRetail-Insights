@@ -97,18 +97,10 @@ function Inventory() {
       )}
 
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        📈 SmartRetail Insights : Inventory Dashboard {user ? ` | 👤 ${user}` : ''}
+        📈 SmartRetail Insights : Inventory Management {user ? ` | 👤 ${user}` : ''}
       </h1>
 
-      {isAuthenticated && !showPopup && (
-        <iframe
-          src="http://localhost:8501"
-          title="Inventory"
-          width="100%"
-          height="800px"
-        />
-      )}
-
+      
       {!isAuthenticated && !showPopup && (
         <LoginRegister
           onSuccess={() => {
