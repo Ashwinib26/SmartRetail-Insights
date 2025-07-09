@@ -9,6 +9,8 @@ function Inventory() {
   const [role, setRole] = useState(null);
   const [user, setUser] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [inventory, setInventory] = useState([]);
+  const [showInventory, setShowInventory] = useState(false);
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
@@ -38,6 +40,48 @@ function Inventory() {
   const handleGoBack = () => {
     navigate('/');
   };
+
+  const tableHeader = {
+    padding: '10px',
+    fontWeight: 'bold',
+    borderBottom: '2px solid #ccc'
+  };
+
+  const tableCell = {
+    padding: '8px',
+    borderBottom: '1px solid #eee'
+  };
+
+  const buttonStyle = {
+    backgroundColor: '#1e272e',
+    color: '#fff',
+    padding: '10px 20px',
+    fontSize: '1rem',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    marginRight: '10px'
+  };
+
+  const sectionStyle = {
+    background: "#ffffff",
+    padding: "1.5rem 2rem",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+    marginBottom: "2rem"
+  };
+
+  const handleToggleInventory = () => {
+    if (!showInventory) {
+      fetchInventory();
+    }
+    setShowInventory(prev => !prev);
+  };
+
+  const fetchInventory = () => {
+      axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
+        .then(res => setInventory(res.data));
+    };
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -115,6 +159,40 @@ function Inventory() {
           }}
         />
       )}
+      <div>
+        <button type="button" onClick={handleToggleInventory} style={buttonStyle}>
+          📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
+        </button>
+      </div>
+                {showInventory && (
+            <div style={sectionStyle}>
+              <h3>📦 Current Inventory Overview</h3>
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                <thead style={{ backgroundColor: '#dfe6e9' }}>
+                  <tr>
+                    <th style={tableHeader}>Item</th>
+                    <th style={tableHeader}>Category</th>
+                    <th style={tableHeader}>Demand</th>
+                    <th style={tableHeader}>Stock</th>
+                    <th style={tableHeader}>Alert</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inventory.map((item, idx) => (
+                    <tr key={idx} style={{ textAlign: 'center' }}>
+                      <td style={tableCell}>{item.item}</td>
+                      <td style={tableCell}>{item.category}</td>
+                      <td style={tableCell}>{item.demand}</td>
+                      <td style={tableCell}>{item.stock}</td>
+                      <td style={tableCell}>
+                        {item.alert ? <span style={{ color: '#d63031' }}>⚠️ Low</span> : <span style={{ color: '#00b894' }}>✅ OK</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
     </div>
   );
 }

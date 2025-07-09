@@ -11,12 +11,9 @@ function Forecast() {
   const [showPopup, setShowPopup] = useState(false);
   const navigate=useNavigate();
   const [forecast, setForecast] = useState(null);
-  const [inventory, setInventory] = useState([]);
   const [dynamicForecast, setDynamicForecast] = useState(null);
 
   const normalizedRole = role ? role.toLowerCase() : '';
-
-  const [showInventory, setShowInventory] = useState(false);
 
   const chartData = dynamicForecast?.next_7_days_sales?.map((sale, index) => ({
     day: `Day ${index + 1}`,
@@ -64,12 +61,11 @@ function Forecast() {
           setRole(res.data.role);
           setUser(res.data.name);
 
-          // ✅ Only show popup if role is not allowed
           if (!['developer', 'admin'].includes(res.data.role.toLowerCase())) {
             setShowPopup(true);
           }
         } else {
-          setShowPopup(true); // Not logged in
+          setShowPopup(true); 
         }
       })
       .catch(err => {
@@ -84,23 +80,6 @@ function Forecast() {
         .then(res => setForecast(res.data));
     }
   }, [isAuthenticated, normalizedRole]);
-
-
-  const fetchInventory = () => {
-    axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
-      .then(res => setInventory(res.data));
-  };
-
-  const handleClosePopup = () => {
-    navigate('/'); 
-  };
-
-  const handleToggleInventory = () => {
-    if (!showInventory) {
-      fetchInventory();
-    }
-    setShowInventory(prev => !prev);
-  };
 
   const getWeekOfYear = (date) => {
     const oneJan = new Date(date.getFullYear(), 0, 1);
@@ -210,17 +189,6 @@ function Forecast() {
     marginRight: '10px'
   };
 
-  const tableHeader = {
-    padding: '10px',
-    fontWeight: 'bold',
-    borderBottom: '2px solid #ccc'
-  };
-
-  const tableCell = {
-    padding: '8px',
-    borderBottom: '1px solid #eee'
-  };
-
    return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fa", minHeight: "100vh" }}>
       {showPopup && (
@@ -302,7 +270,7 @@ function Forecast() {
       {isAuthenticated && !showPopup && (
         <>
           <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-            📈 SmartRetail Insights : Forecast and Inventory {user ? ` | 👤 ${user}` : ''}
+            📈 SmartRetail Insights : Sales Forecast {user ? ` | 👤 ${user}` : ''}
           </h1>
 
           <div style={sectionStyle}>
@@ -330,9 +298,6 @@ function Forecast() {
               <div style={{ marginTop: "1.5rem" }}>
                 <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
                 <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
-                <button type="button" onClick={handleToggleInventory} style={buttonStyle}>
-                  📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
-                </button>
               </div>
             </form>
           </div>
@@ -404,36 +369,6 @@ function Forecast() {
                 </ResponsiveContainer>
               </div>
               </div>
-            </div>
-          )}
-
-          {showInventory && (
-            <div style={sectionStyle}>
-              <h3>📦 Current Inventory Overview</h3>
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-                <thead style={{ backgroundColor: '#dfe6e9' }}>
-                  <tr>
-                    <th style={tableHeader}>Item</th>
-                    <th style={tableHeader}>Category</th>
-                    <th style={tableHeader}>Demand</th>
-                    <th style={tableHeader}>Stock</th>
-                    <th style={tableHeader}>Alert</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inventory.map((item, idx) => (
-                    <tr key={idx} style={{ textAlign: 'center' }}>
-                      <td style={tableCell}>{item.item}</td>
-                      <td style={tableCell}>{item.category}</td>
-                      <td style={tableCell}>{item.demand}</td>
-                      <td style={tableCell}>{item.stock}</td>
-                      <td style={tableCell}>
-                        {item.alert ? <span style={{ color: '#d63031' }}>⚠️ Low</span> : <span style={{ color: '#00b894' }}>✅ OK</span>}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           )}
         </>
