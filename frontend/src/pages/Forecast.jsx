@@ -364,7 +364,7 @@ function Forecast() {
                     <XAxis dataKey="day" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="sales" fill="#0984e3" />
+                    <Bar dataKey="sales" fill="#1e272e" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

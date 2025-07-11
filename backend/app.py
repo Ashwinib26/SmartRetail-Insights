@@ -165,18 +165,55 @@ def forecast():
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
 
+# @app.route('/api/forecast', methods=['POST'])
+# def forecast_dynamic():
+#     if 'user' not in session:
+#         return jsonify({'error': 'Unauthorized'}), 401
+#     if session.get('role').lower() not in ['developer', 'admin']:
+#         return jsonify({'error': 'Forbidden'}), 403
+#     data = request.json
+#     try:
+#         prediction = make_prediction(data)
+#         return jsonify({
+#             'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]
+#         })
+#     except Exception as e:
+#         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
+
 @app.route('/api/forecast', methods=['POST'])
 def forecast_dynamic():
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     if session.get('role').lower() not in ['developer', 'admin']:
         return jsonify({'error': 'Forbidden'}), 403
+
     data = request.json
+
     try:
-        prediction = make_prediction(data)
+        import datetime
+        today = datetime.date.today()
+        inputs = []
+
+        for i in range(7):
+            next_day = today + datetime.timedelta(days=i)
+            day_data = data.copy()
+            day_data['Year'] = next_day.year
+            day_data['Month'] = next_day.month
+            day_data['Day'] = next_day.day
+            day_data['DayOfWeek'] = next_day.isoweekday()
+            day_data['IsWeekend'] = 1 if next_day.weekday() >= 5 else 0
+
+            # Add other day-dependent logic if needed
+
+            inputs.append([day_data.get(f, 0) for f in EXPECTED_FEATURES])
+
+        df = pd.DataFrame(inputs, columns=MODEL_COLUMNS)
+        predictions = model.predict(df).tolist()
+
         return jsonify({
-            'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]
+            'next_7_days_sales': [int(p) for p in predictions]
         })
+
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
