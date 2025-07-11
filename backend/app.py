@@ -209,7 +209,7 @@ def get_inventory():
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT item, category, stock, demand FROM inventory")
+            cursor.execute("SELECT * FROM inventory")
             rows = cursor.fetchall()
             # convert rows to dicts if needed
             data = [dict(row) for row in rows]

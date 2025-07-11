@@ -133,7 +133,7 @@ function Dashboard() {
             onClick={handleToggleChart}
             style={{
               marginTop: '1rem',
-              background: '#0984e3',
+              background: '#1e272e',
               color: '#fff',
               padding: '10px 20px',
               fontSize: '1rem',

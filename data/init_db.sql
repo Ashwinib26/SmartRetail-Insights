@@ -32,7 +32,6 @@ VALUES
 (2, '2023-06-01', 0, 1, 'a', 4100, 4300),
 (1, '2023-06-02', 1, 0, '0', 5800, 6000);
 
--- Create inventory table
 CREATE TABLE inventory (
     id SERIAL PRIMARY KEY,
     item VARCHAR(255),
@@ -42,10 +41,27 @@ CREATE TABLE inventory (
     alert BOOLEAN
 );
 
--- Insert sample inventory data
 INSERT INTO inventory (item, category, location, stock, alert)
 VALUES
 ('TV', 'Electronics', 'Warehouse A', 5, TRUE),
 ('Laptop', 'Electronics', 'Warehouse B', 20, FALSE),
 ('Refrigerator', 'Appliances', 'Warehouse A', 2, TRUE),
 ('Microwave', 'Appliances', 'Warehouse B', 15, FALSE);
+
+
+
+DELIMITER //
+
+CREATE TRIGGER update_alert
+BEFORE UPDATE ON inventory
+FOR EACH ROW
+BEGIN
+  IF NEW.demand > NEW.stock THEN
+    SET NEW.alert = 1;
+  ELSE
+    SET NEW.alert = 0;
+  END IF;
+END;
+//
+
+DELIMITER ;
