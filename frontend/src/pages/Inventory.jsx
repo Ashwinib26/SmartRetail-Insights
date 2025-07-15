@@ -87,7 +87,12 @@ function Inventory() {
   const filteredInventory = inventory.filter(item => {
     if (filter === 'low') return item.alert === 1;
     if (filter === 'in') return item.alert === 0;
-    return true; // all
+    if (filter === 'electronics') return item.category === 'Electronics';
+    if (filter === 'appliances') return item.category === 'Appliances';
+    if (filter === 'clothing') return item.category === 'Clothing';
+    if (filter === 'furniture') return item.category === 'Furniture';
+    if (filter === 'stationery') return item.category === 'Stationery';
+    return true; 
   });
 
   return (
@@ -180,6 +185,11 @@ function Inventory() {
             <option value="all">All Items</option>
             <option value="low">Low Stock</option>
             <option value="in">In Stock</option>
+            <option value="electronics">Electronics</option>
+            <option value="stationery">Stationery</option>
+            <option value="furniture">Furniture</option>
+            <option value="clothing">Clothing</option>
+            <option value="appliances">Appliances</option>
           </select>
         )}
       </div>
