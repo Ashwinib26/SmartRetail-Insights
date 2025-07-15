@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import LoginRegister from './LoginRegister';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
 } from 'recharts';
 
 function Dashboard() {
@@ -13,7 +13,10 @@ function Dashboard() {
   const [user, setUser] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [inventory, setInventory] = useState([]);
-  const [showChart, setShowChart] = useState(false); // ✅ New state
+  const [showChart, setShowChart] = useState(false);
+
+  const [selectedColumns, setSelectedColumns] = useState(['stock', 'demand']);
+  const [chartType, setChartType] = useState('Bar');
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
@@ -46,16 +49,18 @@ function Dashboard() {
       });
   }, [navigate]);
 
-  const handleContinue = () => {
-    navigate('/auth');
+  const handleContinue = () => navigate('/auth');
+  const handleGoBack = () => navigate('/');
+  const handleToggleChart = () => setShowChart(!showChart);
+
+  const handleColumnChange = (col) => {
+    setSelectedColumns(prev =>
+      prev.includes(col) ? prev.filter(c => c !== col) : [...prev, col]
+    );
   };
 
-  const handleGoBack = () => {
-    navigate('/');
-  };
-
-  const handleToggleChart = () => {
-    setShowChart(!showChart);
+  const handleChartTypeChange = (e) => {
+    setChartType(e.target.value);
   };
 
   return (
@@ -83,35 +88,20 @@ function Dashboard() {
               You are not an authorized user for this page.<br />
               Please login with an authorized role to continue.
             </p>
-            <button
-              onClick={handleGoBack}
+            <button onClick={handleGoBack}
               style={{
-                background: '#0984e3',
-                color: '#fff',
-                padding: '10px 20px',
-                fontSize: '1rem',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                marginRight: '1rem'
-              }}
-            >
-              Go Back
-            </button>
-            <button
-              onClick={handleContinue}
+                background: '#0984e3', color: '#fff',
+                padding: '10px 20px', fontSize: '1rem',
+                border: 'none', borderRadius: '8px',
+                cursor: 'pointer', marginRight: '1rem'
+              }}>Go Back</button>
+            <button onClick={handleContinue}
               style={{
-                background: '#0984e3',
-                color: '#fff',
-                padding: '10px 20px',
-                fontSize: '1rem',
-                border: 'none',
-                borderRadius: '8px',
+                background: '#0984e3', color: '#fff',
+                padding: '10px 20px', fontSize: '1rem',
+                border: 'none', borderRadius: '8px',
                 cursor: 'pointer'
-              }}
-            >
-              Continue
-            </button>
+              }}>Continue</button>
           </div>
         </div>
       )}
@@ -129,6 +119,34 @@ function Dashboard() {
             height="800px"
           />
 
+          <div style={{ marginTop: '1rem' }}>
+            <h3>Select Columns to Plot:</h3>
+            <label>
+              <input
+                type="checkbox"
+                checked={selectedColumns.includes('stock')}
+                onChange={() => handleColumnChange('stock')}
+              /> Stock
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              <input
+                type="checkbox"
+                checked={selectedColumns.includes('demand')}
+                onChange={() => handleColumnChange('demand')}
+              /> Demand
+            </label>
+          </div>
+
+          <div style={{ marginTop: '1rem' }}>
+            <label>
+              <h3>Select Chart Type:</h3>
+              <select value={chartType} onChange={handleChartTypeChange}>
+                <option value="Bar">Bar Chart</option>
+                <option value="Line">Line Chart</option>
+              </select>
+            </label>
+          </div>
+
           <button
             onClick={handleToggleChart}
             style={{
@@ -140,21 +158,39 @@ function Dashboard() {
               border: 'none',
               borderRadius: '8px',
               cursor: 'pointer'
-            }}
-          >
-            {showChart ? 'Hide Inventory Chart' : 'Show Inventory Chart'}
+            }}>
+            {showChart ? 'Hide Chart' : 'Show Chart'}
           </button>
 
           {showChart && (
             <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={inventory}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="item" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="stock" fill="#00b894" />
-                <Bar dataKey="demand" fill="#d63031" />
-              </BarChart>
+              {chartType === 'Bar' ? (
+                <BarChart data={inventory}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="item" />
+                  <YAxis />
+                  <Tooltip />
+                  {selectedColumns.includes('stock') && (
+                    <Bar dataKey="stock" fill="#00b894" />
+                  )}
+                  {selectedColumns.includes('demand') && (
+                    <Bar dataKey="demand" fill="#d63031" />
+                  )}
+                </BarChart>
+              ) : (
+                <LineChart data={inventory}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="item" />
+                  <YAxis />
+                  <Tooltip />
+                  {selectedColumns.includes('stock') && (
+                    <Line type="monotone" dataKey="stock" stroke="#00b894" />
+                  )}
+                  {selectedColumns.includes('demand') && (
+                    <Line type="monotone" dataKey="demand" stroke="#d63031" />
+                  )}
+                </LineChart>
+              )}
             </ResponsiveContainer>
           )}
         </>
