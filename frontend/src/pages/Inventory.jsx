@@ -11,6 +11,7 @@ function Inventory() {
   const [showPopup, setShowPopup] = useState(false);
   const [inventory, setInventory] = useState([]);
   const [showInventory, setShowInventory] = useState(false);
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
@@ -79,9 +80,15 @@ function Inventory() {
   };
 
   const fetchInventory = () => {
-      axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
-        .then(res => setInventory(res.data));
-    };
+    axios.get('http://localhost:5000/api/inventory', { withCredentials: true })
+      .then(res => setInventory(res.data));
+  };
+
+  const filteredInventory = inventory.filter(item => {
+    if (filter === 'low') return item.alert === 1;
+    if (filter === 'in') return item.alert === 0;
+    return true; // all
+  });
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -105,7 +112,7 @@ function Inventory() {
           }}>
             <h2 style={{ marginBottom: '1rem', color: '#d63031' }}>🚫 Access Unavailable</h2>
             <p style={{ marginBottom: '2rem' }}>
-              You are not an authorized user for this page.<br/>
+              You are not an authorized user for this page.<br />
               Please login with an authorized role to continue.
             </p>
             <button
@@ -144,7 +151,6 @@ function Inventory() {
         📈 SmartRetail Insights : Inventory Management {user ? ` | 👤 ${user}` : ''}
       </h1>
 
-      
       {!isAuthenticated && !showPopup && (
         <LoginRegister
           onSuccess={() => {
@@ -159,40 +165,54 @@ function Inventory() {
           }}
         />
       )}
+
       <div>
         <button type="button" onClick={handleToggleInventory} style={buttonStyle}>
           📦 {showInventory ? "Hide Inventory" : "Display Inventory"}
         </button>
+
+        {showInventory && (
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            style={{ marginLeft: '1rem', padding: '8px', fontSize: '1rem' }}
+          >
+            <option value="all">All Items</option>
+            <option value="low">Low Stock</option>
+            <option value="in">In Stock</option>
+          </select>
+        )}
       </div>
-                {showInventory && (
-            <div style={sectionStyle}>
-              <h3>📦 Current Inventory Overview</h3>
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
-                <thead style={{ backgroundColor: '#dfe6e9' }}>
-                  <tr>
-                    <th style={tableHeader}>Item</th>
-                    <th style={tableHeader}>Category</th>
-                    <th style={tableHeader}>Demand</th>
-                    <th style={tableHeader}>Stock</th>
-                    <th style={tableHeader}>Alert</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inventory.map((item, idx) => (
-                    <tr key={idx} style={{ textAlign: 'center' }}>
-                      <td style={tableCell}>{item.item}</td>
-                      <td style={tableCell}>{item.category}</td>
-                      <td style={tableCell}>{item.demand}</td>
-                      <td style={tableCell}>{item.stock}</td>
-                      <td style={tableCell}>
-                        {item.alert ? <span style={{ color: '#d63031' }}>⚠️ Low</span> : <span style={{ color: '#00b894' }}>✅ OK</span>}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+
+      {showInventory && (
+        <div style={sectionStyle}>
+          <h3>📦 Current Inventory Overview</h3>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+            <thead style={{ backgroundColor: '#dfe6e9' }}>
+              <tr>
+                <th style={tableHeader}>Item</th>
+                <th style={tableHeader}>Category</th>
+                <th style={tableHeader}>Demand</th>
+                <th style={tableHeader}>Stock</th>
+                <th style={tableHeader}>Alert</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredInventory.map((item, idx) => (
+                <tr key={idx} style={{ textAlign: 'center' }}>
+                  <td style={tableCell}>{item.item}</td>
+                  <td style={tableCell}>{item.category}</td>
+                  <td style={tableCell}>{item.demand}</td>
+                  <td style={tableCell}>{item.stock}</td>
+                  <td style={tableCell}>
+                    {item.alert ? <span style={{ color: '#d63031' }}>⚠️ Low</span> : <span style={{ color: '#00b894' }}>✅ OK</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
