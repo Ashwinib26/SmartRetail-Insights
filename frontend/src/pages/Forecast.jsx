@@ -1,4 +1,6 @@
-import React, { useEffect, useState} from 'react';
+// 📁 Filename: Forecast.js
+
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
 import { useNavigate } from 'react-router-dom';
@@ -9,13 +11,13 @@ function Forecast() {
   const [role, setRole] = useState(null);
   const [user, setUser] = useState('');
   const [showPopup, setShowPopup] = useState(false);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [forecast, setForecast] = useState(null);
   const [dynamicForecast, setDynamicForecast] = useState(null);
 
   const normalizedRole = role ? role.toLowerCase() : '';
 
-  const chartData = dynamicForecast?.next_7_days_sales?.map((sale, index) => ({
+  const chartData = dynamicForecast?.next_n_days_sales?.map((sale, index) => ({
     day: `Day ${index + 1}`,
     sales: sale
   })) || [];
@@ -50,7 +52,9 @@ function Forecast() {
     StateHoliday_c: 0,
     PromoInterval_Feb_May_Aug_Nov: 0,
     PromoInterval_Jan_Apr_Jul_Oct: 0,
-    PromoInterval_Mar_Jun_Sept_Dec: 0
+    PromoInterval_Mar_Jun_Sept_Dec: 0,
+    ForecastDate: '',
+    forecastDays: 7
   });
 
   useEffect(() => {
@@ -65,7 +69,7 @@ function Forecast() {
             setShowPopup(true);
           }
         } else {
-          setShowPopup(true); 
+          setShowPopup(true);
         }
       })
       .catch(err => {
@@ -108,15 +112,15 @@ function Forecast() {
   };
 
   const handleReset = () => {
-  const today = new Date();
-  const weekOfYear = getWeekOfYear(today);
-  const isWeekend = today.getDay() === 0 || today.getDay() === 6 ? 1 : 0;
+    const today = new Date();
+    const weekOfYear = getWeekOfYear(today);
+    const isWeekend = today.getDay() === 0 || today.getDay() === 6 ? 1 : 0;
     setInputData({
-      Store: Math.floor(Math.random() * 10) + 1,
-      DayOfWeek: today.getDay() === 0 ? 7 : today.getDay(),  
+      Store: 1,
+      DayOfWeek: today.getDay() === 0 ? 7 : today.getDay(),
       Open: 1,
-      Promo: Math.round(Math.random()),
-      SchoolHoliday: Math.round(Math.random()),
+      Promo: 0,
+      SchoolHoliday: 0,
       CompetitionDistance: 500.0,
       CompetitionOpenSinceMonth: 1,
       CompetitionOpenSinceYear: 2010,
@@ -142,29 +146,19 @@ function Forecast() {
       PromoInterval_Feb_May_Aug_Nov: 0,
       PromoInterval_Jan_Apr_Jul_Oct: 0,
       PromoInterval_Mar_Jun_Sept_Dec: 0,
-      ForecastDate: today.toISOString().split('T')[0]
+      ForecastDate: today.toISOString().split('T')[0],
+      forecastDays: 7
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const { ForecastDate, ...rest } = inputData;
-    console.log('Sending payload:', rest);
     axios.post('http://localhost:5000/api/forecast', rest, { withCredentials: true })
       .then(res => {
-        console.log(res.data); 
         setDynamicForecast(res.data);
       })
       .catch(err => console.error("Prediction failed:", err));
-
-  };
-
-   const handleContinue = () => {
-    navigate('/auth');
-  };
-
-  const handleGoBack = () => {
-    navigate('/');
   };
 
   const sectionStyle = {
@@ -193,140 +187,49 @@ function Forecast() {
     marginRight: '10px'
   };
 
-   return (
+  return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fa", minHeight: "100vh" }}>
-      {showPopup && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0, 0, 0, 0.6)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999
-        }}>
-          <div style={{
-            background: '#fff',
-            padding: '2rem',
-            borderRadius: '12px',
-            textAlign: 'center',
-            maxWidth: '400px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
-          }}>
-            <h2 style={{ marginBottom: '1rem', color: '#d63031' }}>🚫 Access Unavailable</h2>
-            <p style={{ marginBottom: '2rem' }}>
-              You are not an authorized user for this page.<br/>
-              Please login with authorized role to continue.
-            </p>
-            <button
-              onClick={handleGoBack}
-              style={{
-                background: '#0984e3',
-                color: '#fff',
-                padding: '10px 20px',
-                fontSize: '1rem',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer'
-              }}
-            >
-              Go Back
-            </button>
-            <button
-              onClick={handleContinue}
-              style={{
-                background: '#0984e3',
-                color: '#fff',
-                padding: '10px 20px',
-                fontSize: '1rem',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer'
-              }}
-            >
-              Continue
-            </button>
+      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+        📈 SmartRetail Insights : Sales Forecast {user ? ` | 👤 ${user}` : ''}
+      </h1>
+
+      <div style={sectionStyle}>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
+            {Object.keys(inputData).map((key, i) => (
+              <div key={i}>
+                <label style={{ fontWeight: "500" }}>{key}</label>
+                <input
+                  type={(key === "ForecastDate") ? "date" : "number"}
+                  name={key}
+                  value={inputData[key]}
+                  onChange={handleChange}
+                  style={inputStyle}
+                />
+              </div>
+            ))}
           </div>
+
+          <div style={{ marginTop: "1.5rem" }}>
+            <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
+            <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
+          </div>
+        </form>
+      </div>
+
+      {dynamicForecast && (
+        <div style={{ ...sectionStyle, borderLeft: "6px solid #0984e3", padding: "2rem" }}>
+          <h3 style={{ fontSize: "1.5rem", color: "#0984e3" }}>📅 Forecast Result</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="sales" fill="#0984e3" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-      )}
-
-      {!isAuthenticated && !showPopup && (
-        <LoginRegister
-          onSuccess={() => {
-            axios.get('http://localhost:5000/api/check-auth', { withCredentials: true })
-              .then(res => {
-                if (res.data.authenticated) {
-                  setIsAuthenticated(true);
-                  setRole(res.data.role);
-                  setUser(res.data.name);
-
-                  if (!['developer', 'admin'].includes(res.data.role.toLowerCase())) {
-                    setShowPopup(true);
-                  }
-                } else {
-                  setShowPopup(true);
-                }
-              });
-          }}
-        />
-      )}
-
-      {isAuthenticated && !showPopup && (
-        <>
-          <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-            📈 SmartRetail Insights : Sales Forecast {user ? ` | 👤 ${user}` : ''}
-          </h1>
-
-          <div style={sectionStyle}>
-            <p>Configure the parameters to forecast upcoming sales.</p>
-          </div>
-
-          <div style={sectionStyle}>
-            <h2>Forecast Parameters</h2>
-            <form onSubmit={handleSubmit}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
-                {Object.keys(inputData).map((key, i) => (
-                  <div key={i}>
-                    <label style={{ fontWeight: "500" }}>{key}</label>
-                    <input
-                      type={key === "ForecastDate" ? "date" : "number"}
-                      name={key}
-                      value={inputData[key]}
-                      onChange={handleChange}
-                      style={inputStyle}
-                    />
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ marginTop: "1.5rem" }}>
-                <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
-                <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
-              </div>
-            </form>
-          </div>
-
-          {dynamicForecast !== null && (
-            <div style={{
-              ...sectionStyle,
-              borderLeft: "6px solid #0984e3",
-              padding: "2rem"
-            }}>
-              <h3 style={{ fontSize: "1.5rem", color: "#0984e3" }}>📅 Forecast Result</h3>
-              <div style={{
-                marginTop: "1rem",
-                padding: "1.5rem",
-                backgroundColor: "#dfe6e9",
-                borderRadius: "8px",
-                fontSize: "1.25rem",
-                fontWeight: "600",
-                textAlign: "center"
-              }}>
-                🔮 Predicted Sales (Day 1): <span style={{ color: "#2d3436" }}>{dynamicForecast?.next_7_days_sales?.[0]}</span>
-              </div>
-            </div>
-          )}
-        </>
       )}
     </div>
   );
