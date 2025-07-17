@@ -158,27 +158,10 @@ def forecast():
         }
 
         prediction = make_prediction(static_data)
-        return jsonify({
-            'next_7_days_sales': [123, 123, 123, 123, 123, 123, 123]
-        })
+        return jsonify({"predicted_sales": int(prediction)})
+
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
-
-
-# @app.route('/api/forecast', methods=['POST'])
-# def forecast_dynamic():
-#     if 'user' not in session:
-#         return jsonify({'error': 'Unauthorized'}), 401
-#     if session.get('role').lower() not in ['developer', 'admin']:
-#         return jsonify({'error': 'Forbidden'}), 403
-#     data = request.json
-#     try:
-#         prediction = make_prediction(data)
-#         return jsonify({
-#             'next_7_days_sales': [int(prediction + i * 5) for i in range(7)]
-#         })
-#     except Exception as e:
-#         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
 @app.route('/api/forecast', methods=['POST'])
 def forecast_dynamic():

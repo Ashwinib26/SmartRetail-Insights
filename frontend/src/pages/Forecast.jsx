@@ -151,8 +151,12 @@ function Forecast() {
     const { ForecastDate, ...rest } = inputData;
     console.log('Sending payload:', rest);
     axios.post('http://localhost:5000/api/forecast', rest, { withCredentials: true })
-      .then(res => setDynamicForecast(res.data.predicted_sales)) 
-      .catch(err => alert('Prediction failed: ' + (err.response?.data?.error || err.message)));
+      .then(res => {
+        console.log(res.data); 
+        setDynamicForecast(res.data);
+      })
+      .catch(err => console.error("Prediction failed:", err));
+
   };
 
    const handleContinue = () => {
@@ -318,7 +322,7 @@ function Forecast() {
                 fontWeight: "600",
                 textAlign: "center"
               }}>
-                🔮 Predicted Sales for Selected Day: <span style={{ color: "#2d3436" }}>{dynamicForecast}</span>
+                🔮 Predicted Sales (Day 1): <span style={{ color: "#2d3436" }}>{dynamicForecast?.next_7_days_sales?.[0]}</span>
               </div>
             </div>
           )}
