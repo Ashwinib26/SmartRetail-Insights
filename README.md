@@ -1,6 +1,6 @@
 # 🛒 SmartRetail Insights
 
-SmartRetail Insights is a full-stack web application designed to forecast product sales and provide intelligent retail analytics. It leverages a machine learning model to predict future demand and assists businesses in making data-driven inventory and restocking decisions.
+SmartRetail Insights is a web-based retail analytics and inventory management dashboard that lets different users (Analyst, Developer, Admin) log in, access forecasting tools, and visualize inventory and sales trends.
 
 ---
 
@@ -39,6 +39,17 @@ SMARTRETAIL INSIGHTS/
 └── README.md                        # Project documentation
 
 ````
+
+---
+## 📷 Screenshots 
+| ![Home Page](https://github.com/user-attachments/assets/5537bec3-37ec-4749-940f-af17443cf2f8) | ![Sales Forecast Page](https://github.com/user-attachments/assets/10c63e8e-a4d4-479a-95e6-93aabf19a63c) |
+|:--:|:--:|
+| **1. Home Page** | **2. Sales Forecast Page** |
+
+| ![Inventory Page](https://github.com/user-attachments/assets/cc9cdf9b-cc24-4bd8-a66c-d83a10ae54bf) | ![Dashboard Page](https://github.com/user-attachments/assets/60b4337a-b7e0-4871-a447-3fc368332bb5) |
+|:--:|:--:|
+| **3. Inventory Page** | **4. Dashboard Page** |
+
 
 ---
 
@@ -117,6 +128,9 @@ npm start
 ## 📬 Contact
 
 For questions or collaborations, feel free to reach out at (ashwinisbisen@gmail.com).
+
+---
+THANK YOU !!
 
 ```
 
