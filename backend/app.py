@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import joblib
 import pandas as pd
 import pymysql
+import numpy as np
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -164,41 +165,15 @@ def forecast():
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
 @app.route('/api/forecast', methods=['POST'])
-def forecast_dynamic():
-    if 'user' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-    if session.get('role').lower() not in ['developer', 'admin']:
-        return jsonify({'error': 'Forbidden'}), 403
+def forecast_sales():
+    data = request.get_json()
+    product_id = data.get('ProductID')
+    days = int(data.get('forecastDays', 7))  # Default to 7 if not provided
 
-    data = request.json
+    # Replace the following with your actual forecast logic
+    forecasted_sales = [round(100 + i * 10 + np.random.randint(-5, 5)) for i in range(days)]
 
-    try:
-        import datetime
-        today = datetime.date.today()
-        inputs = []
-
-        for i in range(7):
-            next_day = today + datetime.timedelta(days=i)
-            day_data = data.copy()
-            day_data['Year'] = next_day.year
-            day_data['Month'] = next_day.month
-            day_data['Day'] = next_day.day
-            day_data['DayOfWeek'] = next_day.isoweekday()
-            day_data['IsWeekend'] = 1 if next_day.weekday() >= 5 else 0
-
-            # Add other day-dependent logic if needed
-
-            inputs.append([day_data.get(f, 0) for f in EXPECTED_FEATURES])
-
-        df = pd.DataFrame(inputs, columns=MODEL_COLUMNS)
-        predictions = model.predict(df).tolist()
-
-        return jsonify({
-            'next_7_days_sales': [int(p) for p in predictions]
-        })
-
-    except Exception as e:
-        return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
+    return jsonify({"next_N_days_sales": forecasted_sales})
 
 
 def get_db_connection():
