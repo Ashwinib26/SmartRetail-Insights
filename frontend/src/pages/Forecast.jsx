@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import LoginRegister from './LoginRegister';
 import { useNavigate } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 function Forecast() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -15,6 +15,8 @@ function Forecast() {
   const [forecast, setForecast] = useState(null);
   const [dynamicForecast, setDynamicForecast] = useState(null);
   const [forecastResult, setForecastResult] = useState([]);
+  const [forecastDays, setForecastDays] = useState(7);
+  const [inventory, setInventory] = useState([]); // Dummy placeholder, ideally fetched from API
 
   const normalizedRole = role ? role.toLowerCase() : '';
 
@@ -22,6 +24,11 @@ function Forecast() {
     day: `Day ${index + 1}`,
     sales: sale
   })) || [];
+
+  const forecastChartData = forecastResult.map((val, idx) => ({
+    day: `Day ${idx + 1}`,
+    sales: val
+  }));
 
   const [inputData, setInputData] = useState({
     Store: 1,
@@ -85,10 +92,6 @@ function Forecast() {
         .then(res => setForecast(res.data));
     }
   }, [isAuthenticated, normalizedRole]);
-
-  useEffect(() => {
-    console.log("Forecast response:", dynamicForecast);
-  }, [dynamicForecast]);
 
   const getWeekOfYear = (date) => {
     const oneJan = new Date(date.getFullYear(), 0, 1);
@@ -168,7 +171,7 @@ function Forecast() {
 
   const handleForecast = () => {
     axios.post('http://localhost:5000/api/forecast', {
-      forecastDays: forecastDays || 7,
+      forecastDays: forecastDays,
       sales: inventory.map(item => item.sales) // assuming "sales" field exists
     }, { withCredentials: true })
       .then(res => {
@@ -178,7 +181,6 @@ function Forecast() {
         console.error("Forecast failed", err);
       });
   };
-
 
   const sectionStyle = {
     background: "#ffffff",
@@ -219,10 +221,11 @@ function Forecast() {
               <div key={i}>
                 <label style={{ fontWeight: "500" }}>{key}</label>
                 <input
-                  type="number"
-                  placeholder="Enter days to forecast"
-                  value={forecastDays}
-                  onChange={(e) => setForecastDays(e.target.value)}
+                  style={inputStyle}
+                  type={typeof inputData[key] === 'number' ? 'number' : 'text'}
+                  name={key}
+                  value={inputData[key]}
+                  onChange={handleChange}
                 />
               </div>
             ))}
@@ -246,6 +249,21 @@ function Forecast() {
               <Tooltip />
               <Bar dataKey="sales" fill="#0984e3" />
             </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {forecastResult.length > 0 && (
+        <div style={{ ...sectionStyle, borderLeft: "6px solid #00b894", padding: "2rem" }}>
+          <h3 style={{ fontSize: "1.5rem", color: "#00b894" }}>📊 ARIMA Forecast for {forecastDays} Days</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={forecastChartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="sales" stroke="#00b894" strokeWidth={2} />
+            </LineChart>
           </ResponsiveContainer>
         </div>
       )}

@@ -167,16 +167,20 @@ def forecast():
 
 @app.route('/api/forecast', methods=['POST'])
 def forecast_dynamic():
+    # Authorization check
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
-    if session.get('role').lower() not in ['developer', 'admin']:
+    if session.get('role', '').lower() not in ['developer', 'admin']:
         return jsonify({'error': 'Forbidden'}), 403
 
+    # Parse incoming JSON
     data = request.get_json()
+    if not data:
+        return jsonify({'error': 'Missing JSON body'}), 400
 
     try:
-        forecast_days = int(data.get("forecastDays", 7))  # Default to 7 days
-        sales_series = data.get("sales")  # Expecting a list of historical sales
+        forecast_days = int(data.get("forecastDays", 7))  # default 7
+        sales_series = data.get("sales")  # expecting a list of past sales
 
         if not sales_series or not isinstance(sales_series, list):
             return jsonify({'error': 'Missing or invalid sales data'}), 400
@@ -184,21 +188,21 @@ def forecast_dynamic():
         # Convert list to pandas Series
         ts = pd.Series(sales_series)
 
-        # Fit ARIMA model
-        model = ARIMA(ts, order=(5, 1, 0))  # (p,d,q) can be tuned later
-        model_fit = model.fit()
-
-        # Forecast next n days
-        forecast = model_fit.forecast(steps=forecast_days)
-        forecast_list = forecast.tolist()
+        # Handle constant series (ARIMA fails on it)
+        if ts.nunique() <= 1:
+            forecast = [ts.iloc[-1]] * forecast_days
+        else:
+            # Fit ARIMA model: (p,d,q) values can be tuned based on data
+            model = ARIMA(ts, order=(5, 1, 0))
+            model_fit = model.fit()
+            forecast = model_fit.forecast(steps=forecast_days)
 
         return jsonify({
-            'next_n_days_sales': forecast_list
+            'next_n_days_sales': list(np.round(forecast, 2))
         })
 
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
-
 
 def get_db_connection():
     return pymysql.connect(
