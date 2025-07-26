@@ -85,6 +85,10 @@ function Forecast() {
     }
   }, [isAuthenticated, normalizedRole]);
 
+  useEffect(() => {
+    console.log("Forecast response:", dynamicForecast);
+  }, [dynamicForecast]);
+
   const getWeekOfYear = (date) => {
     const oneJan = new Date(date.getFullYear(), 0, 1);
     return Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);

@@ -165,15 +165,26 @@ def forecast():
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
 @app.route('/api/forecast', methods=['POST'])
-def forecast_sales():
+def forecast_dynamic():
+    if 'user' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    if session.get('role').lower() not in ['developer', 'admin']:
+        return jsonify({'error': 'Forbidden'}), 403
+
     data = request.get_json()
-    product_id = data.get('ProductID')
-    days = int(data.get('forecastDays', 7))  # Default to 7 if not provided
 
-    # Replace the following with your actual forecast logic
-    forecasted_sales = [round(100 + i * 10 + np.random.randint(-5, 5)) for i in range(days)]
+    try:
+        forecast_days = int(data.get("forecastDays", 7))  # Default to 7 if not provided
+        prediction_base = make_prediction(data)
 
-    return jsonify({"next_N_days_sales": forecasted_sales})
+        forecast_result = [int(prediction_base + i * 5) for i in range(forecast_days)]
+        
+        return jsonify({
+            'next_n_days_sales': forecast_result
+        })
+
+    except Exception as e:
+        return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
 
 def get_db_connection():
