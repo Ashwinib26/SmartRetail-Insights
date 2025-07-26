@@ -5,6 +5,7 @@ import joblib
 import pandas as pd
 import pymysql
 import numpy as np
+from statsmodels.tsa.arima.model import ARIMA
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -174,13 +175,25 @@ def forecast_dynamic():
     data = request.get_json()
 
     try:
-        forecast_days = int(data.get("forecastDays", 7))  # Default to 7 if not provided
-        prediction_base = make_prediction(data)
+        forecast_days = int(data.get("forecastDays", 7))  # Default to 7 days
+        sales_series = data.get("sales")  # Expecting a list of historical sales
 
-        forecast_result = [int(prediction_base + i * 5) for i in range(forecast_days)]
-        
+        if not sales_series or not isinstance(sales_series, list):
+            return jsonify({'error': 'Missing or invalid sales data'}), 400
+
+        # Convert list to pandas Series
+        ts = pd.Series(sales_series)
+
+        # Fit ARIMA model
+        model = ARIMA(ts, order=(5, 1, 0))  # (p,d,q) can be tuned later
+        model_fit = model.fit()
+
+        # Forecast next n days
+        forecast = model_fit.forecast(steps=forecast_days)
+        forecast_list = forecast.tolist()
+
         return jsonify({
-            'next_n_days_sales': forecast_result
+            'next_n_days_sales': forecast_list
         })
 
     except Exception as e:

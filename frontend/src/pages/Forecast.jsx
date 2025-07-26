@@ -14,6 +14,7 @@ function Forecast() {
   const navigate = useNavigate();
   const [forecast, setForecast] = useState(null);
   const [dynamicForecast, setDynamicForecast] = useState(null);
+  const [forecastResult, setForecastResult] = useState([]);
 
   const normalizedRole = role ? role.toLowerCase() : '';
 
@@ -165,6 +166,20 @@ function Forecast() {
       .catch(err => console.error("Prediction failed:", err));
   };
 
+  const handleForecast = () => {
+    axios.post('http://localhost:5000/api/forecast', {
+      forecastDays: forecastDays || 7,
+      sales: inventory.map(item => item.sales) // assuming "sales" field exists
+    }, { withCredentials: true })
+      .then(res => {
+        setForecastResult(res.data.next_n_days_sales || []);
+      })
+      .catch(err => {
+        console.error("Forecast failed", err);
+      });
+  };
+
+
   const sectionStyle = {
     background: "#ffffff",
     padding: "1.5rem 2rem",
@@ -204,11 +219,10 @@ function Forecast() {
               <div key={i}>
                 <label style={{ fontWeight: "500" }}>{key}</label>
                 <input
-                  type={(key === "ForecastDate") ? "date" : "number"}
-                  name={key}
-                  value={inputData[key]}
-                  onChange={handleChange}
-                  style={inputStyle}
+                  type="number"
+                  placeholder="Enter days to forecast"
+                  value={forecastDays}
+                  onChange={(e) => setForecastDays(e.target.value)}
                 />
               </div>
             ))}
