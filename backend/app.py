@@ -9,7 +9,7 @@ from statsmodels.tsa.arima.model import ARIMA
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
 users_db = {}   # email -> password_hash
 roles_db = {}   # email -> role
@@ -165,34 +165,27 @@ def forecast():
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
-@app.route('/api/forecast', methods=['POST'])
-def forecast_dynamic():
-    # Simulate session login for testing
-    session['user'] = 'demo_user'
-    session['role'] = 'developer'
-
+@app.route('/api/ml_forecast', methods=['POST'])
+def ml_forecast():
     data = request.get_json()
 
     try:
-        forecast_days = int(data.get("forecastDays", 7))
-        sales_series = data.get("sales")
+        # Load your ML model (e.g., RandomForestRegressor)
+        model = joblib.load('sales_forecast_model.pkl')
 
-        if not sales_series or not isinstance(sales_series, list):
-            return jsonify({'error': 'Missing or invalid sales data'}), 400
+        # Convert JSON to DataFrame with expected columns
+        df = pd.DataFrame([data])
 
-        ts = pd.Series(sales_series)
-        model = ARIMA(ts, order=(5, 1, 0))
-        model_fit = model.fit()
+        forecast = []
+        for _ in range(data.get('forecastDays', 7)):
+            pred = model.predict(df)[0]
+            forecast.append(pred)
 
-        forecast = model_fit.forecast(steps=forecast_days)
-        forecast_list = forecast.tolist()
-
-        return jsonify({
-            'next_n_days_sales': forecast_list
-        })
+        return jsonify({"forecast": forecast})
 
     except Exception as e:
-        return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
+        return jsonify({"error": str(e)}), 500
+
 
 def get_db_connection():
     return pymysql.connect(
@@ -250,4 +243,4 @@ def inventory():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

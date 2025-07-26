@@ -159,28 +159,47 @@ function Forecast() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const { ForecastDate, ...rest } = inputData;
-    axios.post('http://localhost:5000/api/forecast', rest, { withCredentials: true })
-      .then(res => {
-        setDynamicForecast(res.data);
-      })
-      .catch(err => console.error("Prediction failed:", err));
-  };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   const { ForecastDate, ...rest } = inputData;
+  //   axios.post('http://localhost:5000/api/forecast', rest, { withCredentials: true })
+  //     .then(res => {
+  //       setDynamicForecast(res.data);
+  //     })
+  //     .catch(err => console.error("Prediction failed:", err));
+  // };
 
-  const handleForecast = () => {
-    axios.post('http://localhost:5000/api/forecast', {
-      forecastDays: forecastDays,
-      sales: inventory.map(item => item.sales) // assuming "sales" field exists
-    }, { withCredentials: true })
-      .then(res => {
-        setForecastResult(res.data.next_n_days_sales || []);
-      })
-      .catch(err => {
-        console.error("Forecast failed", err);
-      });
-  };
+const handleForecast = async () => {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/forecast', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sales: [100, 120, 130, 110, 115, 140, 150],
+        forecastDays: 5
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Server responded with status ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    if (data.forecast) {
+      alert('Forecast: ' + data.forecast.join(', '));
+    } else {
+      alert('No forecast data received.');
+    }
+
+  } catch (error) {
+    console.error('Error in forecast:', error);
+    alert('Failed to fetch forecast. See console for details.');
+  }
+};
 
   const sectionStyle = {
     background: "#ffffff",
@@ -215,7 +234,7 @@ function Forecast() {
       </h1>
 
       <div style={sectionStyle}>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleForecast}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1rem" }}>
             {Object.keys(inputData).map((key, i) => (
               <div key={i}>
@@ -232,7 +251,7 @@ function Forecast() {
           </div>
 
           <div style={{ marginTop: "1.5rem" }}>
-            <button type="submit" style={buttonStyle}>📈 Get Forecast</button>
+            <button type="submit" style={buttonStyle}>📈 Get Forecast</button>         
             <button type="button" onClick={handleReset} style={buttonStyle}>♻️ Reset</button>
           </div>
         </form>
