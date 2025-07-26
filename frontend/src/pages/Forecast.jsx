@@ -239,30 +239,30 @@ function Forecast() {
       </div>
 
       {dynamicForecast && (
-        <div style={{ ...sectionStyle, borderLeft: "6px solid #0984e3", padding: "2rem" }}>
-          <h3 style={{ fontSize: "1.5rem", color: "#0984e3" }}>📅 Forecast Result</h3>
+        <div style={{ ...sectionStyle, borderLeft: "6px solid #0f1214ff", padding: "2rem" }}>
+          <h3 style={{ fontSize: "1.5rem", color: "#11181eff" }}>📅 Forecast Result</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="day" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="sales" fill="#0984e3" />
+              <Bar dataKey="sales" fill="#0e181fff" />
             </BarChart>
           </ResponsiveContainer>
         </div>
       )}
 
       {forecastResult.length > 0 && (
-        <div style={{ ...sectionStyle, borderLeft: "6px solid #00b894", padding: "2rem" }}>
-          <h3 style={{ fontSize: "1.5rem", color: "#00b894" }}>📊 ARIMA Forecast for {forecastDays} Days</h3>
+        <div style={{ ...sectionStyle, borderLeft: "6px solid #474d4bff", padding: "2rem" }}>
+          <h3 style={{ fontSize: "1.5rem", color: "#585d5cff" }}>📊 ARIMA Forecast for {forecastDays} Days</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={forecastChartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="day" />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="sales" stroke="#00b894" strokeWidth={2} />
+              <Line type="monotone" dataKey="sales" stroke="#49514fff" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>

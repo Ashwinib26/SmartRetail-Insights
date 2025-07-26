@@ -184,10 +184,10 @@ function Dashboard() {
                   <YAxis />
                   <Tooltip />
                   {selectedColumns.includes('stock') && (
-                    <Line type="monotone" dataKey="stock" stroke="#00b894" />
+                    <Line type="monotone" dataKey="stock" stroke="#81908dff" />
                   )}
                   {selectedColumns.includes('demand') && (
-                    <Line type="monotone" dataKey="demand" stroke="#d63031" />
+                    <Line type="monotone" dataKey="demand" stroke="#464343ff" />
                   )}
                 </LineChart>
               )}
