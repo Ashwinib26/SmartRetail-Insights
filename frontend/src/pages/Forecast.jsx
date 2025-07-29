@@ -169,37 +169,33 @@ function Forecast() {
   //     .catch(err => console.error("Prediction failed:", err));
   // };
 
-const handleForecast = async () => {
-  try {
-    const response = await fetch('http://127.0.0.1:5000/api/forecast', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        sales: [100, 120, 130, 110, 115, 140, 150],
-        forecastDays: 5
-      }),
-    });
+  const handleForecast = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/api/forecast', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',  // important for cookies/session if used
+        body: JSON.stringify({
+          sales: [100, 120, 130, 110, 115, 140, 150],
+          forecastDays: 5,
+        }),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Server responded with status ${response.status}: ${errorText}`);
-    }
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-    const data = await response.json();
-
-    if (data.forecast) {
+      const data = await response.json();
+      console.log('Forecast:', data);
       alert('Forecast: ' + data.forecast.join(', '));
-    } else {
-      alert('No forecast data received.');
+    } catch (error) {
+      console.error('Error in forecast:', error);
+      alert('Failed to fetch forecast. See console for details.');
     }
+  };
 
-  } catch (error) {
-    console.error('Error in forecast:', error);
-    alert('Failed to fetch forecast. See console for details.');
-  }
-};
 
   const sectionStyle = {
     background: "#ffffff",

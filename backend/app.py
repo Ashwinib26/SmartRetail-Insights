@@ -8,7 +8,7 @@ import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'
+app.secret_key = 'your-secret-key'
 CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 
 users_db = {}   # email -> password_hash
@@ -165,26 +165,29 @@ def forecast():
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
-@app.route('/api/ml_forecast', methods=['POST'])
-def ml_forecast():
+# @app.route('/api/forecast', methods=['POST'])
+# def forecast():
+#     data = request.get_json()
+#     sales = data.get('sales', [])
+#     forecast_days = data.get('forecastDays', 0)
+
+#     if not sales or not forecast_days:
+#         return jsonify({'error': 'Missing sales or forecastDays'}), 400
+
+#     # Dummy forecast logic for example
+#     forecast = [sales[-1] + i*5 for i in range(1, forecast_days + 1)]
+#     return jsonify({'forecast': forecast})
+
+
+@app.route('/api/forecast', methods=['POST'])
+def forecast():
     data = request.get_json()
-
-    try:
-        # Load your ML model (e.g., RandomForestRegressor)
-        model = joblib.load('sales_forecast_model.pkl')
-
-        # Convert JSON to DataFrame with expected columns
-        df = pd.DataFrame([data])
-
-        forecast = []
-        for _ in range(data.get('forecastDays', 7)):
-            pred = model.predict(df)[0]
-            forecast.append(pred)
-
-        return jsonify({"forecast": forecast})
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    sales = data.get('sales', [])
+    
+    # Dummy forecast result
+    forecast_result = [s + 10 for s in sales]
+    
+    return jsonify({'forecast': forecast_result})
 
 
 def get_db_connection():
