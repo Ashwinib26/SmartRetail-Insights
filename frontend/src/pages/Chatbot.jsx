@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
 
 const Chatbot = () => {
   const [message, setMessage] = useState("");
-  const [response, setResponse] = useState("");
+  const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(false);
   const [typingDots, setTypingDots] = useState("");
+  const [lastPrompt, setLastPrompt] = useState("");
 
   useEffect(() => {
     if (!loading) return;
@@ -15,28 +17,49 @@ const Chatbot = () => {
   }, [loading]);
 
   const handleSend = async () => {
-    if (!message.trim()) return;
+    const trimmed = message.trim();
+    if (!trimmed) return;
+
     setLoading(true);
-    setResponse("");
+    setReply("");
+    setLastPrompt(trimmed);
 
     try {
-      const res = await fetch("http://localhost:5000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
-      });
+      const res = await axios.post("http://localhost:5000/chat", { message: trimmed });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.reply || "Unknown server error");
+      if (res.status !== 200) {
+        throw new Error(res.data?.reply || "Unknown server error");
       }
-      setResponse(data.reply);
-    } catch (error) {
-      console.error("Fetch or server error:", error);
-      setResponse(error.message);
+
+      setReply(res.data.reply);
+    } catch (err) {
+      console.error("Error while sending message:", err);
+      setReply(`⚠️ Error: ${err.message}`);
     } finally {
       setLoading(false);
-      setMessage("");
+      setMessage(""); // Clear input field
+    }
+  };
+
+  const refreshResponse = async () => {
+    if (!lastPrompt) return;
+
+    setLoading(true);
+    setReply("");
+
+    try {
+      const res = await axios.post("http://localhost:5000/chat", { message: lastPrompt });
+
+      if (res.status !== 200) {
+        throw new Error(res.data?.reply || "Unknown server error");
+      }
+
+      setReply(res.data.reply);
+    } catch (err) {
+      console.error("Error while refreshing response:", err);
+      setReply(`⚠️ Error: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,8 +79,11 @@ const Chatbot = () => {
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
           style={styles.input}
         />
-        <button onClick={handleSend} style={styles.button}>
-          🚀 Send
+        <button onClick={handleSend} style={styles.button} title="Send">
+          🚀
+        </button>
+        <button onClick={refreshResponse} style={styles.button} title="Refresh">
+          🔄
         </button>
       </div>
 
@@ -65,7 +91,7 @@ const Chatbot = () => {
         {loading ? (
           <p style={styles.typing}>⏳ Thinking{typingDots}</p>
         ) : (
-          response && <p style={styles.response}>{response}</p>
+          reply && <p style={styles.response}>{reply}</p>
         )}
       </div>
     </div>
@@ -120,7 +146,7 @@ const styles = {
     color: "#fff",
     border: "none",
     borderRadius: "12px",
-    fontSize: "1rem",
+    fontSize: "1.2rem",
     cursor: "pointer",
     transition: "background 0.3s ease, transform 0.2s ease",
   },
