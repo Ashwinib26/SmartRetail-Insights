@@ -9,6 +9,7 @@ import Auth from './pages/LoginRegister';
 import DetailedInventory from './pages/Inventory';
 import Forecast from './pages/Forecast';
 import axios from 'axios';
+import Chatbot from './pages/Chatbot';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -34,6 +35,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard setUser={setUser} />} />
         <Route path="/auth" element={<Auth setUser={setUser} />} />
         <Route path="/detailed-inventory" element={<DetailedInventory />} />
+        <Route path="/chatbot" element={<Chatbot />} />
       </Routes>
       <Footer />
     </Router>

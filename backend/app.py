@@ -142,7 +142,7 @@ def check_auth():
 
 
 @app.route('/api/forecast', methods=['GET'])
-def forecast():
+def get_forecast():
     if 'user' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     if session.get('role').lower() not in ['developer', 'admin']:
@@ -165,29 +165,29 @@ def forecast():
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
+
+@app.route('/api/forecast', methods=['POST'])
+def post_forecast():
+    data = request.get_json()
+    sales = data.get('sales', [])
+    forecast_days = data.get('forecastDays', 0)
+
+    if not sales or not forecast_days:
+        return jsonify({'error': 'Missing sales or forecastDays'}), 400
+
+    forecast = [sales[-1] + i * 5 for i in range(1, forecast_days + 1)]
+    return jsonify({'forecast': forecast})
+
+
 # @app.route('/api/forecast', methods=['POST'])
 # def forecast():
 #     data = request.get_json()
 #     sales = data.get('sales', [])
-#     forecast_days = data.get('forecastDays', 0)
-
-#     if not sales or not forecast_days:
-#         return jsonify({'error': 'Missing sales or forecastDays'}), 400
-
-#     # Dummy forecast logic for example
-#     forecast = [sales[-1] + i*5 for i in range(1, forecast_days + 1)]
-#     return jsonify({'forecast': forecast})
-
-
-@app.route('/api/forecast', methods=['POST'])
-def forecast():
-    data = request.get_json()
-    sales = data.get('sales', [])
     
-    # Dummy forecast result
-    forecast_result = [s + 10 for s in sales]
+#     # Dummy forecast result
+#     forecast_result = [s + 10 for s in sales]
     
-    return jsonify({'forecast': forecast_result})
+#     return jsonify({'forecast': forecast_result})
 
 
 def get_db_connection():

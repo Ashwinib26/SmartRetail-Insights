@@ -30,6 +30,7 @@ function Navbar({ user , setUser }) {
         <Link to="/forecast" style={styles.link}>Forecast</Link>
         <Link to="/detailed-inventory" style={styles.link}>Inventory</Link>
         <Link to="/dashboard" style={styles.link}>Dashboard</Link>
+        <Link to="/chatbot" style={styles.link}>InsightBot</Link>
         {user ? (
           <span style={{ ...styles.link, cursor: 'pointer' }} onClick={fetchUserDetails}>
             <FaUserCircle size={24} />
