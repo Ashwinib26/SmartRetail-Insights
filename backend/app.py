@@ -5,7 +5,12 @@ import joblib
 import pandas as pd
 import pymysql
 import numpy as np
-from statsmodels.tsa.arima.model import ARIMA
+from dotenv import load_dotenv
+from pathlib import Path
+from bot import ask_chatbot
+
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -140,6 +145,20 @@ def check_auth():
     finally:
         connection.close()
 
+@app.route("/chat", methods=["POST"])
+def chat():
+    try:
+        data = request.get_json(force=True)
+        prompt = data.get("message", "").strip()
+        if not prompt:
+            return jsonify({"reply": "⚠️ Please enter a message."}), 400
+
+        reply = ask_chatbot(prompt)
+        return jsonify({"reply": reply})
+
+    except Exception as e:
+        app.logger.exception("Chat error:")
+        return jsonify({"reply": f"⚠️ Internal error: {e}"}), 500
 
 @app.route('/api/forecast', methods=['GET'])
 def get_forecast():
