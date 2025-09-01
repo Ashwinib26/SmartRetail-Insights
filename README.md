@@ -1,6 +1,6 @@
 # 🛒 SmartRetail Insights
 
-SmartRetail Insights is a web-based retail analytics and inventory management dashboard that lets different users (Analyst, Developer, Admin) log in, access forecasting tools, and visualize inventory and sales trends.
+SmartRetail Insights is a web-based retail analytics and inventory management platform. It allows users like Analysts, Developers, and Admins to log in, forecast sales, track inventory, and visualize business trends through an integrated dashboard. The system includes AI-powered chatbot support and helps optimize restocking decisions with predictive insights.
 
 ---
 
@@ -18,6 +18,7 @@ SMARTRETAIL INSIGHTS/
 │   ├── routes/                       # (Optional) Flask route modules
 │   ├── venv/                         # Python virtual environment
 │   ├── app.py                        # Flask backend entry point
+│   ├── bot.py                        # chatbot model file
 │   └── ForeCastModel.ipynb          # Model training and exploration
 │
 ├── data/                             # Dataset used for training
@@ -28,7 +29,10 @@ SMARTRETAIL INSIGHTS/
 │   └── src/
 │       ├── components/              # Shared React components
 │       ├── pages/
+│       │   ├── Forecast.jsx        # Sales Forecasting page
+│       │   ├── Inventory.jsx        # Inventory Analysis page
 │       │   ├── Dashboard.jsx        # Main dashboard with insights
+│       │   ├── ChatBot.jsx        # Integrated Chatbot model page
 │       │   ├── Home.jsx             # Landing/homepage
 │       │   └── LoginRegister.jsx    # Login/Signup forms
 │       ├── App.js                   # Main React component
@@ -55,11 +59,13 @@ SMARTRETAIL INSIGHTS/
 
 ## 🚀 Features
 
-- 🧠 **Sales Forecasting:** Uses a trained ML model (e.g., LightGBM) for future sales prediction.
-- 📊 **Dashboard:** Visual insights for sales, demand, and restocking needs.
-- 🔐 **Authentication:** Login and registration pages with secure routing.
-- 🌐 **API:** Flask backend with REST API endpoints.
-- 💻 **Modern Frontend:** Built with React for responsive and dynamic UI.
+- 🧠 **Sales Forecasting:** Predicts future sales using a trained ML model (e.g., LightGBM) via an interactive Forecast component.
+- 📦 **Inventory Management:** Dedicated Inventory page displays current stock levels and sales history for smarter restocking decisions.
+- 📊 **Dashboard:** Centralized Dashboard page providing visual analytics for retail performance, demand trends, and inventory flow.
+- 💬 **Business Chatbot (AI Assistant):** AI-powered chatbot component to assist with business insights, FAQs, and operational queries.
+- 🔐 **Authentication:** Secure login and registration with protected routing.
+- 🌐 **RESTful API:** Flask backend serving real-time data and ML forecasts through API endpoints.
+- 💻 **Modern Frontend:** Responsive and dynamic UI built with React and integrated components for seamless user experience.
 
 ---
 
@@ -105,15 +111,16 @@ npm start
 | Backend  | Flask, Flask-CORS, SQLite   |
 | ML Model | LightGBM / scikit-learn     |
 | Storage  | Joblib, SQLite (`users.db`) |
+| API      | Gemini (for chatbot) |
 
 ---
 
 ## 🧪 Future Improvements
 
-* Add CI/CD deployment using Docker
-* Add role-based user access
-* Implement historical analytics with charts
-
+* 🚢 **CI/CD Deployment with Docker:** Containerize the full-stack application and automate deployment using Docker and GitHub Actions or similar CI/CD tools.
+* 📈 **Advanced Historical Analytics:** Integrate time-series visualizations and trend analysis for historical sales, demand patterns, and inventory levels.
+* 🗣️ **Enhance Chatbot Intelligence:** Improve the business chatbot’s capabilities with contextual memory, report generation, and integration with business documents.
+  
 ---
 
 ## 🙌 Acknowledgments
@@ -131,6 +138,3 @@ For questions or collaborations, feel free to reach out at (ashwinisbisen@gmail.
 
 ---
 THANK YOU !!
-
-```
-
