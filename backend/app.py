@@ -19,31 +19,36 @@ CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 users_db = {}   # email -> password_hash
 roles_db = {}   # email -> role
 
-model = joblib.load('D:/projects/Final Project/SmartRetail Insights/backend/sales_forecast_model.pkl')
+model = joblib.load('D:/projects/Final Project/SmartRetail Insights/data/lgbm_model2.pkl')
 print("Loaded model:", type(model))
 
 EXPECTED_FEATURES = [
-  "Store", "DayOfWeek", "Open", "Promo", "SchoolHoliday",
-  "CompetitionDistance", "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear",
-  "Promo2", "Promo2SinceWeek", "Promo2SinceYear",
-  "Year", "Month", "Day", "WeekOfYear", "IsWeekend",
-  "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d",
-  "Assortment_a", "Assortment_b", "Assortment_c",
-  "StateHoliday_0", "StateHoliday_a", "StateHoliday_b", "StateHoliday_c",
-  "PromoInterval_Feb_May_Aug_Nov", "PromoInterval_Jan_Apr_Jul_Oct",
-  "PromoInterval_Mar_Jun_Sept_Dec"
+    "Store", "DayOfWeek", "Open", "Promo", "SchoolHoliday",
+    "CompetitionDistance", "CompetitionOpenSinceMonth", "CompetitionOpenSinceYear",
+    "Promo2", "Promo2SinceWeek", "Promo2SinceYear",
+    "Year", "Month", "Day", "WeekOfYear",
+    "StoreType_a", "StoreType_b", "StoreType_c", "StoreType_d",
+    "Assortment_a", "Assortment_b", "Assortment_c",
+    "StateHoliday_0", "StateHoliday_a", "StateHoliday_b", "StateHoliday_c",
+    "IsPromoMonth"
 ]
-
-MODEL_COLUMNS = [f'Column_{i}' for i in range(len(EXPECTED_FEATURES))]
 
 MODEL_COLUMNS = EXPECTED_FEATURES.copy()
 print("Expected features:", len(EXPECTED_FEATURES))
 
 def make_prediction(input_dict):
+    """
+    input_dict: dictionary containing all or some of the features
+    Missing features will be filled with 0 by default
+    """
     full_input = {f: input_dict.get(f, 0) for f in EXPECTED_FEATURES}
+    
     ordered_values = [full_input[f] for f in EXPECTED_FEATURES]
+    
     df = pd.DataFrame([ordered_values], columns=MODEL_COLUMNS)
+    
     prediction = model.predict(df)[0]
+    
     return prediction
 
 @app.route('/api/register', methods=['POST'])
@@ -51,7 +56,7 @@ def register():
     data = request.json
     name = data.get('name')
     email = data.get('email')
-    password = data.get('password')  # 👉 plain text
+    password = data.get('password') 
     role = data.get('role', 'Analyst')
 
     if not email or not password or not role or not name:
