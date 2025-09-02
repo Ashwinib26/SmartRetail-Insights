@@ -3,12 +3,14 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+
 function Forecast() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [role, setRole] = useState(null);
   const [user, setUser] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [dynamicForecast, setDynamicForecast] = useState(null);
+  const [predictedSales, setPredictedSales] = useState(null);
 
   const navigate = useNavigate();
   const normalizedRole = role ? role.toLowerCase() : '';
@@ -147,12 +149,13 @@ function Forecast() {
 
       const data = await response.json();
       setDynamicForecast({ next_n_days_sales: [data.predicted_sales] });
-      alert('Predicted Sales: ' + data.predicted_sales);
+      setPredictedSales(data.predicted_sales); // <-- store value
     } catch (error) {
       console.error('Forecast failed:', error);
       alert('Failed to fetch forecast. See console for details.');
     }
   };
+
 
   const sectionStyle = { background: "#ffffff", padding: "1.5rem 2rem", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.05)", marginBottom: "2rem" };
   const inputStyle = { padding: "8px", width: "100%", borderRadius: "6px", border: "1px solid #ccc" };
@@ -160,7 +163,9 @@ function Forecast() {
 
   return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fa", minHeight: "100vh" }}>
-      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>📈 SmartRetail Insights : Sales Forecast {user ? ` | 👤 ${user}` : ''}</h1>
+      <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
+        📈 SmartRetail Insights : Sales Forecast {user ? ` | 👤 ${user}` : ''}
+      </h1>
 
       <div style={sectionStyle}>
         <form onSubmit={handleForecast}>
@@ -181,7 +186,13 @@ function Forecast() {
             ))}
             <div>
               <label style={{ fontWeight: "500" }}>ForecastDate</label>
-              <input type="date" name="ForecastDate" value={inputData.ForecastDate} onChange={handleChange} style={inputStyle} />
+              <input
+                type="date"
+                name="ForecastDate"
+                value={inputData.ForecastDate}
+                onChange={handleChange}
+                style={inputStyle}
+              />
             </div>
           </div>
 
@@ -191,6 +202,13 @@ function Forecast() {
           </div>
         </form>
       </div>
+
+      {/* Display predicted sales for next day */}
+      {predictedSales !== null && (
+        <div style={{ marginTop: '1.5rem', fontSize: '1.2rem', fontWeight: '500', color: '#0e181fff' }}>
+          Predicted sales for the next day is: {predictedSales.toLocaleString()}
+        </div>
+      )}
 
       {dynamicForecast && (
         <div style={{ ...sectionStyle, borderLeft: "6px solid #0f1214ff", padding: "2rem" }}>
