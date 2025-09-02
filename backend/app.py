@@ -166,16 +166,37 @@ def get_forecast():
         return jsonify({'error': 'Unauthorized'}), 401
     if session.get('role').lower() not in ['developer', 'admin']:
         return jsonify({'error': 'Forbidden'}), 403
+
     try:
+        # Updated static data according to new features
         static_data = {
-            'Store': 1, 'DayOfWeek': 4, 'Open': 1, 'Promo': 1, 'SchoolHoliday': 0,
-            'CompetitionDistance': 200.0, 'CompetitionOpenSinceMonth': 9, 'CompetitionOpenSinceYear': 2010,
-            'Promo2': 1, 'Promo2SinceWeek': 13, 'Promo2SinceYear': 2015,
-            'Year': 2022, 'Month': 1, 'Day': 1, 'WeekOfYear': 1, 'IsWeekend': 0,
-            'StoreType_a': 1, 'StoreType_b': 0, 'StoreType_c': 0, 'StoreType_d': 0,
-            'Assortment_a': 1, 'Assortment_b': 0, 'Assortment_c': 0,
-            'PromoInterval_Feb_May_Aug_Nov': 0, 'PromoInterval_Jan_Apr_Jul_Oct': 1,
-            'PromoInterval_Mar_Jun_Sept_Dec': 0, 'PromoInterval_None': 0
+            'Store': 1,
+            'DayOfWeek': 4,
+            'Open': 1,
+            'Promo': 1,
+            'SchoolHoliday': 0,
+            'CompetitionDistance': 200.0,
+            'CompetitionOpenSinceMonth': 9,
+            'CompetitionOpenSinceYear': 2010,
+            'Promo2': 1,
+            'Promo2SinceWeek': 13,
+            'Promo2SinceYear': 2015,
+            'Year': 2022,
+            'Month': 1,
+            'Day': 1,
+            'WeekOfYear': 1,
+            'StoreType_a': 1,
+            'StoreType_b': 0,
+            'StoreType_c': 0,
+            'StoreType_d': 0,
+            'Assortment_a': 1,
+            'Assortment_b': 0,
+            'Assortment_c': 0,
+            'StateHoliday_0': 1,
+            'StateHoliday_a': 0,
+            'StateHoliday_b': 0,
+            'StateHoliday_c': 0,
+            'IsPromoMonth': 1
         }
 
         prediction = make_prediction(static_data)
@@ -188,26 +209,16 @@ def get_forecast():
 @app.route('/api/forecast', methods=['POST'])
 def post_forecast():
     data = request.get_json()
-    sales = data.get('sales', [])
-    forecast_days = data.get('forecastDays', 0)
+    features = data.get('features', {})
 
-    if not sales or not forecast_days:
-        return jsonify({'error': 'Missing sales or forecastDays'}), 400
+    if not features:
+        return jsonify({'error': 'Missing features'}), 400
 
-    forecast = [sales[-1] + i * 5 for i in range(1, forecast_days + 1)]
-    return jsonify({'forecast': forecast})
-
-
-# @app.route('/api/forecast', methods=['POST'])
-# def forecast():
-#     data = request.get_json()
-#     sales = data.get('sales', [])
-    
-#     # Dummy forecast result
-#     forecast_result = [s + 10 for s in sales]
-    
-#     return jsonify({'forecast': forecast_result})
-
+    try:
+        prediction = make_prediction(features)
+        return jsonify({'predicted_sales': int(prediction)})
+    except Exception as e:
+        return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
 def get_db_connection():
     return pymysql.connect(
