@@ -215,13 +215,37 @@ def get_forecast():
 def post_forecast():
     data = request.get_json()
     features = data.get('features', {})
+    forecast_days = features.pop('forecastDays', 1)  # default = 1 day
 
     if not features:
         return jsonify({'error': 'Missing features'}), 400
 
     try:
-        prediction = make_prediction(features)
-        return jsonify({'predicted_sales': int(prediction)})
+        predictions = []
+        current_features = features.copy()
+
+        for i in range(forecast_days):
+            prediction = make_prediction(current_features)
+            predictions.append(int(prediction))
+
+            # 🔹 Optionally roll forward date-related features
+            # e.g., simulate "next day"
+            from datetime import datetime, timedelta
+            if "Year" in current_features and "Month" in current_features and "Day" in current_features:
+                date = datetime(
+                    current_features["Year"], 
+                    current_features["Month"], 
+                    current_features["Day"]
+                ) + timedelta(days=1)
+
+                current_features["Year"] = date.year
+                current_features["Month"] = date.month
+                current_features["Day"] = date.day
+                current_features["WeekOfYear"] = date.isocalendar()[1]
+                current_features["DayOfWeek"] = date.isoweekday()
+
+        return jsonify({'next_n_days_sales': predictions})
+
     except Exception as e:
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 

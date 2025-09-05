@@ -142,7 +142,7 @@ function Forecast() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ features: inputData }),
+        body: JSON.stringify({ features: inputData, forecastDays: inputData.forecastDays}),
       });
 
       if (!response.ok) throw new Error('Network response not ok');
@@ -194,6 +194,18 @@ function Forecast() {
                 style={inputStyle}
               />
             </div>
+            <div>
+              <label style={{ fontWeight: "500" }}>Forecast Days</label>
+              <input
+                style={inputStyle}
+                type="number"
+                name="forecastDays"
+                value={inputData.forecastDays}
+                min="1"
+                max="30"
+                onChange={handleChange}
+              />
+            </div>
           </div>
 
           <div style={{ marginTop: "1.5rem" }}>
@@ -206,7 +218,12 @@ function Forecast() {
       {/* Display predicted sales for next day */}
       {predictedSales !== null && (
         <div style={{ marginTop: '1.5rem', fontSize: '1.2rem', fontWeight: '500', color: '#0e181fff' }}>
-          Predicted sales for the next day is: {predictedSales.toLocaleString()}
+          <p>
+            Predicted Sales for next day is:{" "}
+            {predictedSales !== undefined && predictedSales !== null
+              ? predictedSales.toLocaleString()
+              : "N/A"}
+          </p>
         </div>
       )}
 
