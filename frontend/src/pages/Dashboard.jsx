@@ -117,30 +117,54 @@ function Dashboard() {
             title="Inventory"
             width="100%"
             height="800px"
+            style={{
+              border: "2px solid #2c2c2c",
+              borderRadius: "12px",
+              marginBottom: "1.5rem",
+            }}
           />
 
-          <div style={{ marginTop: '1rem' }}>
-            <h3>Select Columns to Plot:</h3>
-            <label>
+          <div style={{ marginTop: "1rem" }}>
+            <h3 style={{ color: "#1e272e", marginBottom: "0.5rem" }}>
+              Select Columns to Plot:
+            </h3>
+            <label style={{ marginRight: "1.5rem", fontWeight: "500" }}>
               <input
                 type="checkbox"
-                checked={selectedColumns.includes('stock')}
-                onChange={() => handleColumnChange('stock')}
-              /> Stock
+                checked={selectedColumns.includes("stock")}
+                onChange={() => handleColumnChange("stock")}
+                style={{ marginRight: "0.5rem" }}
+              />
+              Stock
             </label>
-            <label style={{ marginLeft: '1rem' }}>
+            <label style={{ fontWeight: "500" }}>
               <input
                 type="checkbox"
-                checked={selectedColumns.includes('demand')}
-                onChange={() => handleColumnChange('demand')}
-              /> Demand
+                checked={selectedColumns.includes("demand")}
+                onChange={() => handleColumnChange("demand")}
+                style={{ marginRight: "0.5rem" }}
+              />
+              Demand
             </label>
           </div>
 
-          <div style={{ marginTop: '1rem' }}>
+          <div style={{ marginTop: "1rem" }}>
             <label>
-              <h3>Select Chart Type:</h3>
-              <select value={chartType} onChange={handleChartTypeChange}>
+              <h3 style={{ color: "#1e272e", marginBottom: "0.5rem" }}>
+                Select Chart Type:
+              </h3>
+              <select
+                value={chartType}
+                onChange={handleChartTypeChange}
+                style={{
+                  padding: "8px 12px",
+                  fontSize: "1rem",
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  background: "#f4f4f4",
+                  color: "#1e272e",
+                }}
+              >
                 <option value="Bar">Bar Chart</option>
                 <option value="Line">Line Chart</option>
               </select>
@@ -150,44 +174,49 @@ function Dashboard() {
           <button
             onClick={handleToggleChart}
             style={{
-              marginTop: '1rem',
-              background: '#1e272e',
-              color: '#fff',
-              padding: '10px 20px',
-              fontSize: '1rem',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer'
-            }}>
-            {showChart ? 'Hide Chart' : 'Show Chart'}
+              marginTop: "1.5rem",
+              background: "#1e1e1e",
+              color: "#ffffff",
+              padding: "12px 24px",
+              fontSize: "1rem",
+              border: "none",
+              borderRadius: "10px",
+              cursor: "pointer",
+              fontWeight: "500",
+              transition: "all 0.3s ease",
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.background = "#333")}
+            onMouseOut={(e) => (e.currentTarget.style.background = "#1e1e1e")}
+          >
+            {showChart ? "Hide Chart" : "Show Chart"}
           </button>
 
           {showChart && (
             <ResponsiveContainer width="100%" height={400}>
-              {chartType === 'Bar' ? (
+              {chartType === "Bar" ? (
                 <BarChart data={inventory}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="item" />
-                  <YAxis />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                  <XAxis dataKey="item" stroke="#333" />
+                  <YAxis stroke="#333" />
                   <Tooltip />
-                  {selectedColumns.includes('stock') && (
-                    <Bar dataKey="stock" fill="#00b894" />
+                  {selectedColumns.includes("stock") && (
+                    <Bar dataKey="stock" fill="#555" />
                   )}
-                  {selectedColumns.includes('demand') && (
-                    <Bar dataKey="demand" fill="#d63031" />
+                  {selectedColumns.includes("demand") && (
+                    <Bar dataKey="demand" fill="#111" />
                   )}
                 </BarChart>
               ) : (
                 <LineChart data={inventory}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="item" />
-                  <YAxis />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                  <XAxis dataKey="item" stroke="#333" />
+                  <YAxis stroke="#333" />
                   <Tooltip />
-                  {selectedColumns.includes('stock') && (
-                    <Line type="monotone" dataKey="stock" stroke="#81908dff" />
+                  {selectedColumns.includes("stock") && (
+                    <Line type="monotone" dataKey="stock" stroke="#666" strokeWidth={2} />
                   )}
-                  {selectedColumns.includes('demand') && (
-                    <Line type="monotone" dataKey="demand" stroke="#464343ff" />
+                  {selectedColumns.includes("demand") && (
+                    <Line type="monotone" dataKey="demand" stroke="#000" strokeWidth={2} />
                   )}
                 </LineChart>
               )}
