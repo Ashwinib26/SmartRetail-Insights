@@ -144,12 +144,23 @@ function Forecast() {
         credentials: 'include',
         body: JSON.stringify({ features: inputData, forecastDays: inputData.forecastDays}),
       });
+      console.log("Forecast API response:", response);
 
       if (!response.ok) throw new Error('Network response not ok');
 
       const data = await response.json();
-      setDynamicForecast({ next_n_days_sales: [data.predicted_sales] });
-      setPredictedSales(data.predicted_sales); // <-- store value
+      if (data.next_n_days_sales) {
+        setDynamicForecast({ next_n_days_sales: data.next_n_days_sales });
+        setPredictedSales(data.next_n_days_sales[0]); // store first day as "next day"
+      } 
+      else 
+      {
+        setDynamicForecast({ next_n_days_sales: [data.predicted_sales] });
+        setPredictedSales(data.predicted_sales);
+      }
+
+      console.log("Forecast API parsed data:", data);
+
     } catch (error) {
       console.error('Forecast failed:', error);
       alert('Failed to fetch forecast. See console for details.');
@@ -215,30 +226,18 @@ function Forecast() {
         </form>
       </div>
 
-      {/* Display predicted sales for next day */}
-      {predictedSales !== null && (
+      {dynamicForecast?.next_n_days_sales && (
         <div style={{ marginTop: '1.5rem', fontSize: '1.2rem', fontWeight: '500', color: '#0e181fff' }}>
-          {dynamicForecast?.next_n_days_sales && (
-            <div
-              style={{
-                marginTop: '1.5rem',
-                fontSize: '1.2rem',
-                fontWeight: '500',
-                color: '#0e181fff'
-              }}
-            >
-              <ul>
-                {dynamicForecast.next_n_days_sales.map((sale, index) => (
-                  <li key={index}>
-                    Predicted Sales for Day {index + 1}:{" "}
-                    {sale !== undefined && sale !== null ? sale.toLocaleString() : "N/A"}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          </div>
-        )}
+          <ul>
+            {dynamicForecast.next_n_days_sales.map((sale, index) => (
+              <li key={index}>
+                Predicted Sales for Day {index + 1}:{" "}
+                {sale !== undefined && sale !== null ? sale.toLocaleString() : "N/A"}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {dynamicForecast && (
         <div style={{ ...sectionStyle, borderLeft: "6px solid #0f1214ff", padding: "2rem" }}>
