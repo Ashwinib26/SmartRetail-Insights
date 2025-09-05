@@ -218,14 +218,27 @@ function Forecast() {
       {/* Display predicted sales for next day */}
       {predictedSales !== null && (
         <div style={{ marginTop: '1.5rem', fontSize: '1.2rem', fontWeight: '500', color: '#0e181fff' }}>
-          <p>
-            Predicted Sales for next day is:{" "}
-            {predictedSales !== undefined && predictedSales !== null
-              ? predictedSales.toLocaleString()
-              : "N/A"}
-          </p>
-        </div>
-      )}
+          {dynamicForecast?.next_n_days_sales && (
+            <div
+              style={{
+                marginTop: '1.5rem',
+                fontSize: '1.2rem',
+                fontWeight: '500',
+                color: '#0e181fff'
+              }}
+            >
+              <ul>
+                {dynamicForecast.next_n_days_sales.map((sale, index) => (
+                  <li key={index}>
+                    Predicted Sales for Day {index + 1}:{" "}
+                    {sale !== undefined && sale !== null ? sale.toLocaleString() : "N/A"}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          </div>
+        )}
 
       {dynamicForecast && (
         <div style={{ ...sectionStyle, borderLeft: "6px solid #0f1214ff", padding: "2rem" }}>
